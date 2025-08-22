@@ -6,9 +6,21 @@ import { calculateAll, CalcInput } from "@/lib/calc";
 import { buildWeekPlan, buildGroceryList } from "@/lib/meal";
 import { buildTrainingPlan } from "@/lib/training";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
-const FROM = process.env.FROM_EMAIL || "coach@example.com";
-const SEND_EMAIL = String(process.env.SEND_EMAIL ?? "true").toLowerCase() === "true";
+export const runtime = "nodejs"; // ensure Node runtime on Vercel
+
+const FROM = process.env.FROM_EMAIL ?? "coach@example.com";
+const SEND_EMAIL =
+  String(process.env.SEND_EMAIL ?? "true").toLowerCase() === "true";
+
+function getResendOrNull(): Resend | null {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  try {
+    return new Resend(key);
+  } catch {
+    return null;
+  }
+}
 
 type DietType = "none" | "vegetarian" | "vegan" | "keto";
 type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete";
@@ -55,7 +67,10 @@ export async function POST(req: Request) {
     for (const key of required) {
       const v = body[key];
       if (v === undefined || v === null || v === "") {
-        return NextResponse.json({ error: `Missing field: ${key}` }, { status: 400 });
+        return NextResponse.json(
+          { error: `Missing field: ${key}` },
+          { status: 400 }
+        );
       }
     }
 
@@ -86,7 +101,9 @@ export async function POST(req: Request) {
     // Training preferences
     const daysPerWeek = Math.min(Math.max(Number(body.daysPerWeek ?? 4), 2), 6);
     const equipment = (body.equipment ?? "home") as Equipment;
-    const preferredActivities: string[] = Array.isArray(body.preferredActivities)
+    const preferredActivities: string[] = Array.isArray(
+      body.preferredActivities
+    )
       ? body.preferredActivities
       : String(body.preferredActivities ?? "")
           .split(",")
@@ -103,34 +120,45 @@ export async function POST(req: Request) {
       cuisineLikes,
     });
     const grocery = buildGroceryList(weekPlan);
-    const training = buildTrainingPlan({ daysPerWeek, equipment, preferredActivities });
+    const training = buildTrainingPlan({
+      daysPerWeek,
+      equipment,
+      preferredActivities,
+    });
 
     // Email (capture errors instead of throwing)
     let emailId: string | undefined;
     let emailError: string | undefined;
 
     if (SEND_EMAIL && typeof body.email === "string" && body.email && body.consent === true) {
-      try {
-        const { data, error } = await resend.emails.send({
-          from: FROM, // e.g. coach@donetsfit.com
-          to: body.email,
-          subject: "Your DonetsFit Weekly Plan",
-          react: PlanEmail({
-            name: body.name || "athlete",
-            ...input,
-            ...result,
-            weekPlan,
-            grocery,
-            training,
-          }),
-        });
-        if (error) {
-          emailError = (error as { message?: string }).message ?? String(error);
-        } else {
-          emailId = data?.id;
+      const resend = getResendOrNull();
+      if (!resend) {
+        emailError =
+          "Email service not configured: missing or invalid RESEND_API_KEY.";
+      } else {
+        try {
+          const { data, error } = await resend.emails.send({
+            from: FROM, // e.g. coach@donetsfit.com (must be a verified domain in Resend)
+            to: body.email,
+            subject: "Your DonetsFit Weekly Plan",
+            react: PlanEmail({
+              name: body.name || "athlete",
+              ...input,
+              ...result,
+              weekPlan,
+              grocery,
+              training,
+            }),
+          });
+          if (error) {
+            emailError =
+              (error as { message?: string }).message ?? String(error);
+          } else {
+            emailId = data?.id;
+          }
+        } catch (err) {
+          emailError = err instanceof Error ? err.message : String(err);
         }
-      } catch (err) {
-        emailError = err instanceof Error ? err.message : String(err);
       }
     }
 
