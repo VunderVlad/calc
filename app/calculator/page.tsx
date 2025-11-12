@@ -1,661 +1,466 @@
-'use client';
+"use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { useState, useEffect, CSSProperties } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useI18n } from "@/lib/i18n";
 
-type State = {
-  sex: 'male' | 'female';
-  age: number;
-  heightCm: number;
-  weightKg: number;
-  activity: 'sedentary' | 'light' | 'moderate' | 'very' | 'athlete';
-  goal: 'lose' | 'maintain' | 'gain';
-  // nutrition
-  dietType: 'none' | 'vegetarian' | 'vegan' | 'keto';
-  exclusions: string;       // comma list (derived from UI chips)
-  cuisineLikes: string;     // comma list (derived from UI chips)
-  mealsPerDay: number;      // 3 | 4 | 5
-  timeToCook: number;       // 10 | 20 | 30
-  // training
-  daysPerWeek: number;      // 3 | 4 | 5 | 6
-  equipment: 'home' | 'gym' | 'calisthenics';
-  preferredActivities: string; // comma list
-  // email
-  name: string;
-  email: string;
-  consent: boolean;
-  // extras
-  preferredFoods?: string;  // comma list (derived from UI chips)
-};
+/* ---------------- Types ---------------- */
+type Mode = "student" | "trainer";
+type FormData = Record<string, string | number | boolean | undefined>;
 
-type ApiResult = {
-  bmr: number; tdee: number; targetCalories: number;
-  proteinG: number; fatG: number; carbsG: number;
-};
-type ApiDayPlan = { day: string; meals: { name: string; calories: number }[]; total: number };
-type ApiTraining = { day: string; title: string; exercises: string[] };
-type ApiResponse = {
+interface ApiResult {
   ok: boolean;
-  result: ApiResult;
-  weekPlan: ApiDayPlan[];
-  grocery: string[];
-  training: ApiTraining[];
-  emailed: boolean;
-  emailId?: string;
-};
+  calc?: {
+    bmr?: number | null;
+    tdee?: number | null;
+    targetCalories?: number;
+    proteinG?: number;
+    fatG?: number;
+    carbsG?: number;
+  };
+}
 
-const ALLERGENS = ['nuts', 'dairy', 'gluten', 'eggs', 'fish', 'soy'] as const;
-const CUISINES = ['slovak', 'ukrainian', 'mediterranean', 'asian', 'general'] as const;
-
+/* ---------------- Page ---------------- */
 export default function CalculatorPage() {
-  const [state, setState] = useState<State>({
-    sex: 'male', age: 25, heightCm: 175, weightKg: 70,
-    activity: 'moderate', goal: 'maintain',
-    dietType: 'none',
-    exclusions: '', cuisineLikes: '',
-    mealsPerDay: 3, timeToCook: 20,
-    daysPerWeek: 4, equipment: 'home', preferredActivities: '',
-    name: '', email: '', consent: false,
-  });
+  const { t, lang } = useI18n();
+  const router = useRouter();
+  const search = useSearchParams();
 
-  const [exclusionsSel, setExclusionsSel] = useState<string[]>([]);
-  const [cuisineSel, setCuisineSel] = useState<string[]>([]);
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [favInput, setFavInput] = useState('');
+  const initialMode = (search.get("mode") as Mode) || "student";
+  const [mode, setMode] = useState<Mode>(initialMode);
 
+  useEffect(() => {
+    const sp = new URLSearchParams(Array.from(search.entries()));
+    sp.set("mode", mode);
+    router.replace(`/calculator?${sp.toString()}`);
+  }, [mode, search, router]);
+
+  const [form, setForm] = useState<FormData>({});
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ApiResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [touched, setTouched] = useState<{ name?: boolean; email?: boolean }>({});
+  const [result, setResult] = useState<ApiResult | null>(null);
 
-  const numberFields = useMemo(
-    () =>
-      new Set<keyof State>([
-        'age', 'heightCm', 'weightKg', 'mealsPerDay', 'timeToCook', 'daysPerWeek',
-      ]),
-    []
-  );
-
-  const emailValid = useMemo(() => {
-    if (!state.email) return false;
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email);
-  }, [state.email]);
-
-  const nameValid = state.name.trim().length > 1;
-  const formValid = nameValid && emailValid;
-
-  const handle = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const target = e.target as (HTMLInputElement | HTMLSelectElement) & { name: keyof State };
-    const name = target.name;
-    let parsed: State[typeof name];
-
-    if ((target as HTMLInputElement).type === 'checkbox') {
-      parsed = ((target as HTMLInputElement).checked) as State[typeof name];
-    } else if (numberFields.has(name)) {
-      parsed = Number(target.value) as State[typeof name];
-    } else {
-      parsed = target.value as State[typeof name];
-    }
-    setState(prev => ({ ...prev, [name]: parsed }));
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
+    const val =
+      type === "number"
+        ? Number(value)
+        : type === "checkbox"
+        ? (e.target as HTMLInputElement).checked
+        : value;
+    setForm((prev) => ({ ...prev, [name]: val }));
   };
 
-  const toggleChip = (list: string[], value: string, setter: (s: string[]) => void) => {
-    setter(list.includes(value) ? list.filter(v => v !== value) : [...list, value]);
-  };
-
-  const addFavorite = () => {
-    const v = favInput.trim().toLowerCase();
-    if (!v) return;
-    if (!favorites.includes(v)) setFavorites(prev => [...prev, v]);
-    setFavInput('');
-  };
-
-  const removeFavorite = (val: string) => {
-    setFavorites(prev => prev.filter(v => v !== val));
-  };
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTouched({ name: true, email: true });
-    if (!formValid) return;
+    setLoading(true);
+    setResult(null);
 
-    setLoading(true); setError(null); setResult(null);
-
-    const payload: State = {
-      ...state,
-      exclusions: exclusionsSel.join(','),
-      cuisineLikes: cuisineSel.join(','),
-      preferredFoods: favorites.join(','),
+    const payload = {
+      mode,
+      ...form,
+      age: Number(form.age) || undefined,
+      heightCm: Number(form.heightCm) || undefined,
+      weightKg: Number(form.weightKg) || undefined,
+      mealsPerDay: Number(form.mealsPerDay) || undefined,
+      timeToCook: Number(form.timeToCook) || undefined,
+      targetCalories: Number(form.targetCalories) || undefined,
+      proteinG: Number(form.proteinG) || undefined,
+      fatG: Number(form.fatG) || undefined,
+      proteinPerKg: Number(form.proteinPerKg) || undefined,
+      fatPerKg: Number(form.fatPerKg) || undefined,
     };
 
     try {
-      const res = await fetch('/api/calc', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/calc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      const json: unknown = await res.json();
-      if (!res.ok) {
-        const errData = json as { error?: string };
-        throw new Error(errData.error ?? 'Unknown error');
-      }
-
-      const data = json as ApiResponse;
+      const data: ApiResult = await res.json();
       setResult(data);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
-  }
-
-  // ===== Theme + Responsive CSS (global) =====
-  const red = '#ff4d4d';
-  const resetAndResponsive = `
-    /* Reset + guard for full-bleed bg on all screens */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; background: #1a1a1a; }
-
-    /* Responsive helpers */
-    @media (max-width: 1200px) {
-      .df-container { padding: 40px 18px; }
-    }
-    /* Tablets & down: force single column for every field group */
-    @media (max-width: 980px) {
-      .df-grid2 { grid-template-columns: 1fr !important; gap: 14px !important; }
-      .df-heading { font-size: 28px !important; }
-      .df-sub { font-size: 15px !important; }
-      .df-submit { width: 100%; justify-content: center; }
-    }
-    /* Mobile */
-    @media (max-width: 600px) {
-      .df-container { padding: 28px 14px; }
-      .df-heading { font-size: 24px !important; }
-      .df-sub { font-size: 14px !important; }
-      .df-input { padding: 14px 14px !important; font-size: 16px !important; } /* avoid iOS zoom */
-      .df-chips { gap: 10px !important; }
-    }
-  `;
-
-  // ===== Inline tokens =====
-  const page: React.CSSProperties = {
-    minHeight: '100vh',
-    width: '100%',
-    backgroundColor: '#1a1a1a',
-    color: '#fff',
-    fontFamily:
-      "'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-    textRendering: 'optimizeLegibility',
   };
 
-  const container: React.CSSProperties = {
-    maxWidth: 960,
-    margin: '0 auto',
-    padding: '56px 22px', // wide screens generous padding
-  };
-
-  const heading: React.CSSProperties = {
-    fontSize: 32,
-    fontWeight: 800,
-    marginBottom: 8,
-  };
-
-  const sub: React.CSSProperties = {
-    color: '#cfcfcf',
-    marginBottom: 28,
-    lineHeight: 1.7,
-    fontSize: 16,
-  };
-
-  const sectionTitle: React.CSSProperties = {
-    fontSize: 20,
-    fontWeight: 700,
-    marginTop: 20,
-    marginBottom: 10,
-  };
-
-  const formGrid: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: '1fr',
-    gap: 18,
-  };
-
-  const grid2: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    columnGap: 18,
-    rowGap: 14,
-  };
-
-  const labelCol: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-  };
-
-  const inputBase: React.CSSProperties = {
-    width: '100%',
-    backgroundColor: '#222',
-    color: '#fff',
-    border: '1px solid rgba(255,255,255,0.18)',
-    borderRadius: 10,
-    padding: '12px 14px',
-    fontSize: 15,
-    lineHeight: 1.3,
-    outline: 'none',
-  };
-
-  const checkboxRow: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 10,
-  };
-
-  const submitBtn: React.CSSProperties = {
-    background:
-      'linear-gradient(180deg, rgba(255,77,77,1) 0%, rgba(255,120,120,1) 100%)',
-    color: '#0b0b0b',
-    border: 'none',
-    borderRadius: 12,
-    padding: '14px 20px',
-    fontWeight: 800,
-    cursor: 'pointer',
-    display: 'inline-flex',
-  };
-
-  const panel: React.CSSProperties = {
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 12,
-    padding: 18,
-    backgroundColor: '#181818',
-  };
-
-  const listDisc: React.CSSProperties = {
-    listStyleType: 'disc',
-    paddingLeft: 22,
-  };
-
-  const chipsRow: React.CSSProperties = {
-    display: 'flex',
-    gap: 10,
-    flexWrap: 'wrap',
-    alignItems: 'center',
-  };
-
-  const chip: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    padding: '9px 12px',
-    borderRadius: 999,
-    border: '1px solid rgba(255,255,255,0.2)',
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    cursor: 'pointer',
-    userSelect: 'none',
-    fontSize: 14,
-  };
-
-  const chipActive: React.CSSProperties = {
-    ...chip,
-    border: `1px solid ${red}`,
-    backgroundColor: 'rgba(255,77,77,0.18)',
-  };
-
-  const chipRemoveBtn: React.CSSProperties = {
-    appearance: 'none',
-    border: 'none',
-    background: 'transparent',
-    color: red,
-    fontWeight: 800,
-    cursor: 'pointer',
-    padding: 0,
-    lineHeight: 1,
-  };
-
-  const helperText: React.CSSProperties = { color: '#9aa3b2', fontSize: 13 };
-  const errorText: React.CSSProperties = { color: red, fontSize: 13 };
-
-  const smallNote = (color: string): React.CSSProperties => ({
-    color,
-    fontSize: 14,
-  });
-
+  /* ---------------- Render ---------------- */
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: resetAndResponsive }} />
-      <main style={page}>
-        <div style={container} className="df-container">
-          <h1 style={heading} className="df-heading">DonetsFit Calculator</h1>
-          <p style={sub} className="df-sub">
-            Calories, macros, a 7‑day meal plan, grocery list, and a training split.
-            You’ll also get it by email if you opt‑in.
-          </p>
+    <main key={lang} style={styles.main}>
+      <div style={styles.wrapper}>
+        <h1 style={styles.title}>{t.calc.title}</h1>
+        <p style={styles.subtitle}>{t.calc.subtitle}</p>
 
-          <form onSubmit={onSubmit} style={formGrid} noValidate>
-            {/* Basics */}
-            <div style={grid2} className="df-grid2">
-              <label style={labelCol}>Sex
-                <select name="sex" value={state.sex} onChange={handle} style={inputBase} className="df-input" aria-label="Sex">
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </label>
-              <label style={labelCol}>Age
-                <input type="number" name="age" value={state.age} onChange={handle} style={inputBase} className="df-input" min={10} max={100} aria-label="Age" />
-              </label>
-              <label style={labelCol}>Height (cm)
-                <input type="number" name="heightCm" value={state.heightCm} onChange={handle} style={inputBase} className="df-input" min={120} max={230} aria-label="Height in centimeters" />
-              </label>
-              <label style={labelCol}>Weight (kg)
-                <input type="number" name="weightKg" value={state.weightKg} onChange={handle} style={inputBase} className="df-input" min={35} max={200} aria-label="Weight in kilograms" />
-              </label>
-              <label style={labelCol}>Activity
-                <select name="activity" value={state.activity} onChange={handle} style={inputBase} className="df-input" aria-label="Activity level">
-                  <option value="sedentary">Sedentary</option>
-                  <option value="light">Light (1–3x/wk)</option>
-                  <option value="moderate">Moderate (3–5x/wk)</option>
-                  <option value="very">Very (6–7x/wk)</option>
-                  <option value="athlete">Athlete</option>
-                </select>
-              </label>
-              <label style={labelCol}>Goal
-                <select name="goal" value={state.goal} onChange={handle} style={inputBase} className="df-input" aria-label="Goal">
-                  <option value="lose">Lose fat</option>
-                  <option value="maintain">Maintain</option>
-                  <option value="gain">Gain</option>
-                </select>
-              </label>
-            </div>
-
-            {/* Food preferences */}
-            <h2 style={sectionTitle}>Food preferences</h2>
-            <div style={grid2} className="df-grid2">
-              <label style={labelCol}>Diet type
-                <select name="dietType" value={state.dietType} onChange={handle} style={inputBase} className="df-input" aria-label="Diet type">
-                  <option value="none">No restriction</option>
-                  <option value="vegetarian">Vegetarian</option>
-                  <option value="vegan">Vegan</option>
-                  <option value="keto">Keto</option>
-                </select>
-              </label>
-
-              <label style={labelCol}>Meals per day
-                <select name="mealsPerDay" value={state.mealsPerDay} onChange={handle} style={inputBase} className="df-input" aria-label="Meals per day">
-                  <option value={3}>3</option>
-                  <option value={4}>4</option>
-                  <option value={5}>5</option>
-                </select>
-              </label>
-
-              <label style={labelCol}>Time to cook
-                <select name="timeToCook" value={state.timeToCook} onChange={handle} style={inputBase} className="df-input" aria-label="Time to cook">
-                  <option value={10}>~10 min</option>
-                  <option value={20}>~20 min</option>
-                  <option value={30}>30+ min</option>
-                </select>
-              </label>
-
-              {/* Exclusions */}
-              <div style={labelCol}>
-                <span>Exclusions (allergens)</span>
-                <div style={chipsRow} className="df-chips" role="group" aria-label="Exclude allergens">
-                  {ALLERGENS.map(a => {
-                    const active = exclusionsSel.includes(a);
-                    return (
-                      <button
-                        key={a}
-                        type="button"
-                        onClick={() => toggleChip(exclusionsSel, a, setExclusionsSel)}
-                        style={active ? chipActive : chip}
-                        aria-pressed={active}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={active}
-                          readOnly
-                          aria-hidden="true"
-                          style={{ width: 18, height: 18, accentColor: red }}
-                        />
-                        <span style={{ textTransform: 'capitalize' }}>{a}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <span style={helperText}>Select everything you cannot eat.</span>
-              </div>
-
-              {/* Cuisine likes */}
-              <div style={labelCol}>
-                <span>Cuisine likes</span>
-                <div style={chipsRow} className="df-chips" role="group" aria-label="Cuisine likes">
-                  {CUISINES.map(c => {
-                    const active = cuisineSel.includes(c);
-                    return (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => toggleChip(cuisineSel, c, setCuisineSel)}
-                        style={active ? chipActive : chip}
-                        aria-pressed={active}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={active}
-                          readOnly
-                          aria-hidden="true"
-                          style={{ width: 18, height: 18, accentColor: red }}
-                        />
-                        <span style={{ textTransform: 'capitalize' }}>{c}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <span style={helperText}>Choose one or more cuisines you enjoy.</span>
-              </div>
-
-              {/* Favorite ingredients */}
-              <div style={{ ...labelCol, gridColumn: '1 / span 2' }}>
-                <span>Favorite ingredients (add multiple)</span>
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                  <input
-                    type="text"
-                    value={favInput}
-                    onChange={(e) => setFavInput(e.target.value)}
-                    style={{ ...inputBase, flex: '1 1 280px' }}
-                    placeholder="e.g. chicken, rice, avocado"
-                    aria-label="Add favorite ingredient"
-                    className="df-input"
-                  />
-                  <button
-                    type="button"
-                    onClick={addFavorite}
-                    style={submitBtn}
-                    aria-label="Add ingredient"
-                  >
-                    Add
-                  </button>
-                </div>
-
-                {favorites.length > 0 && (
-                  <div style={{ ...chipsRow, marginTop: 10 }}>
-                    {favorites.map((f) => (
-                      <span key={f} style={chipActive}>
-                        <span style={{ textTransform: 'capitalize' }}>{f}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeFavorite(f)}
-                          style={chipRemoveBtn}
-                          aria-label={`Remove ${f}`}
-                          title="Remove"
-                        >
-                          ×
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <span style={helperText}>We’ll try to include meals using these foods.</span>
-              </div>
-            </div>
-
-            {/* Training */}
-            <h2 style={sectionTitle}>Training</h2>
-            <div style={grid2} className="df-grid2">
-              <label style={labelCol}>Days per week
-                <select name="daysPerWeek" value={state.daysPerWeek} onChange={handle} style={inputBase} className="df-input" aria-label="Training days per week">
-                  <option value={3}>3</option>
-                  <option value={4}>4</option>
-                  <option value={5}>5</option>
-                  <option value={6}>6</option>
-                </select>
-              </label>
-              <label style={labelCol}>Equipment
-                <select name="equipment" value={state.equipment} onChange={handle} style={inputBase} className="df-input" aria-label="Training equipment">
-                  <option value="home">Home</option>
-                  <option value="calisthenics">Calisthenics</option>
-                  <option value="gym">Gym</option>
-                </select>
-              </label>
-              <label style={{ ...labelCol, gridColumn: '1 / span 2' }}>Preferred activities (comma)
-                <input
-                  type="text"
-                  name="preferredActivities"
-                  value={state.preferredActivities}
-                  onChange={handle}
-                  style={inputBase}
-                  className="df-input"
-                  placeholder="running, swimming"
-                  aria-label="Preferred activities"
-                />
-              </label>
-            </div>
-
-            {/* Delivery */}
-            <h2 style={sectionTitle}>Delivery</h2>
-            <div style={grid2} className="df-grid2">
-              <label style={labelCol}>Name <span aria-hidden="true" style={{ color: red }}>*</span>
-                <input
-                  type="text"
-                  name="name"
-                  value={state.name}
-                  onChange={handle}
-                  onBlur={() => setTouched(t => ({ ...t, name: true }))}
-                  style={inputBase}
-                  className="df-input"
-                  required
-                  aria-invalid={touched.name && !nameValid}
-                  aria-label="Name"
-                />
-                {touched.name && !nameValid && (
-                  <span style={errorText}>Please enter your name (at least 2 characters).</span>
-                )}
-              </label>
-
-              <label style={labelCol}>Email <span aria-hidden="true" style={{ color: red }}>*</span>
-                <input
-                  type="email"
-                  name="email"
-                  value={state.email}
-                  onChange={handle}
-                  onBlur={() => setTouched(t => ({ ...t, email: true }))}
-                  style={inputBase}
-                  className="df-input"
-                  required
-                  aria-invalid={touched.email && !emailValid}
-                  aria-label="Email"
-                />
-                {touched.email && !emailValid && (
-                  <span style={errorText}>Enter a valid email like user@example.com.</span>
-                )}
-              </label>
-
-              <label style={{ ...checkboxRow, gridColumn: '1 / span 2' }}>
-                <input
-                  type="checkbox"
-                  name="consent"
-                  checked={state.consent}
-                  onChange={handle}
-                  style={{ width: 20, height: 20, accentColor: red }}
-                  aria-label="Email consent"
-                />
-                <span>I agree to receive my plan by email.</span>
-              </label>
-            </div>
-
+        {/* Mode switch */}
+        <div style={styles.modeSwitch}>
+          {[
+            { id: "student", label: t.calc.mode.student },
+            { id: "trainer", label: t.calc.mode.trainer },
+          ].map((m) => (
             <button
-              type="submit"
-              disabled={loading || !formValid}
-              style={{ ...submitBtn, opacity: loading || !formValid ? 0.7 : 1 }}
-              className="df-submit"
-              aria-label="Generate plan"
+              key={m.id}
+              type="button"
+              onClick={() => setMode(m.id as Mode)}
+              style={
+                mode === m.id
+                  ? { ...styles.modeButton, ...styles.modeButtonActive }
+                  : styles.modeButton
+              }
             >
-              {loading ? 'Building your plan…' : 'Generate plan'}
+              {m.label}
             </button>
-          </form>
-
-          {error && <p style={{ marginTop: 18, color: red }}>{error}</p>}
-
-          {result && (
-            <div style={{ marginTop: 26, display: 'grid', gap: 18 }}>
-              <div style={panel}>
-                <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 10 }}>Your results</h2>
-                <p><b>BMR:</b> {result.result.bmr} kcal/day</p>
-                <p><b>TDEE:</b> {result.result.tdee} kcal/day</p>
-                <p><b>Target Calories:</b> {result.result.targetCalories} kcal/day</p>
-                <p>
-                  <b>Macros:</b> Protein {result.result.proteinG}g • Fat {result.result.fatG}g • Carbs {result.result.carbsG}g
-                </p>
-              </div>
-
-              <div style={panel}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Meal plan (preview)</h3>
-                {result.weekPlan.map((d, i) => {
-                  const target = result.result.targetCalories;
-                  const delta = d.total - target;
-                  const within = Math.abs(delta) <= target * 0.10;
-                  const color = within ? '#20c997' : delta > 0 ? '#d39e00' : '#3b82f6';
-                  const sign = delta > 0 ? '+' : '';
-                  return (
-                    <div key={i} style={{ marginBottom: 12 }}>
-                      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                        <p style={{ fontWeight: 600 }}>{d.day}</p>
-                        <p style={{ fontSize: 14 }}>
-                          <span style={{ fontWeight: 700 }}>{d.total} kcal</span>{' '}
-                          <span style={smallNote(color)}>({sign}{delta} vs {target})</span>
-                        </p>
-                      </div>
-                      <ul style={listDisc}>
-                        {d.meals.map((m, j) => (
-                          <li key={j}>{m.name} — {m.calories} kcal</li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div style={panel}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Grocery list</h3>
-                <ul style={listDisc}>
-                  {result.grocery.map((g, i) => (<li key={i}>{g}</li>))}
-                </ul>
-              </div>
-
-              <div style={panel}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Training plan</h3>
-                {result.training.map((t, i) => (
-                  <div key={i} style={{ marginBottom: 10 }}>
-                    <p style={{ fontWeight: 600 }}>{t.day}: {t.title}</p>
-                    <ul style={listDisc}>
-                      {t.exercises.map((ex, k) => (<li key={k}>{ex}</li>))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          ))}
         </div>
-      </main>
-    </>
+
+        {/* FORM */}
+        <form onSubmit={handleSubmit} style={styles.form}>
+          {mode === "student" ? (
+            <>
+              <SectionTitle title={t.calc.basics} />
+              <div style={styles.grid}>
+                <FormSelect
+                  label={t.calc.sex}
+                  name="sex"
+                  value={String(form.sex ?? "")}
+                  onChange={handleChange}
+                  options={[
+                    { value: "male", label: t.calc.male || "Male" },
+                    { value: "female", label: t.calc.female || "Female" },
+                  ]}
+                />
+                <FormInput
+                  label={t.calc.age}
+                  name="age"
+                  type="number"
+                  min={12}
+                  max={100}
+                  onChange={handleChange}
+                />
+                <FormInput
+                  label={t.calc.height}
+                  name="heightCm"
+                  type="number"
+                  onChange={handleChange}
+                />
+                <FormInput
+                  label={t.calc.weight}
+                  name="weightKg"
+                  type="number"
+                  onChange={handleChange}
+                />
+              </div>
+
+              <SectionTitle title={`${t.calc.activity} & ${t.calc.goal}`} />
+
+              <FormSelect
+                label={t.calc.activity}
+                name="activity"
+                value={String(form.activity ?? "")}
+                onChange={handleChange}
+                options={[
+                  { value: "sedentary", label: t.calc.activityLevels.sedentary },
+                  { value: "light", label: t.calc.activityLevels.light },
+                  { value: "moderate", label: t.calc.activityLevels.moderate },
+                  { value: "very", label: t.calc.activityLevels.very },
+                  { value: "athlete", label: t.calc.activityLevels.athlete },
+                ]}
+              />
+
+              <FormSelect
+                label={t.calc.goal}
+                name="goal"
+                value={String(form.goal ?? "")}
+                onChange={handleChange}
+                options={[
+                  { value: "lose", label: t.calc.goals.lose },
+                  { value: "maintain", label: t.calc.goals.maintain },
+                  { value: "gain", label: t.calc.goals.gain },
+                ]}
+              />
+            </>
+          ) : (
+            <>
+              <SectionTitle title={t.calc.proTargets} />
+              <FormInput
+                label={t.calc.targetCalories}
+                name="targetCalories"
+                type="number"
+                onChange={handleChange}
+              />
+              <div style={styles.grid}>
+                <FormInput
+                  label={t.calc.proteinG}
+                  name="proteinG"
+                  type="number"
+                  onChange={handleChange}
+                />
+                <FormInput
+                  label={t.calc.fatG}
+                  name="fatG"
+                  type="number"
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div style={styles.orText}>{t.calc.or}</div>
+
+              <div style={styles.grid}>
+                <FormInput
+                  label={t.calc.proteinPerKg}
+                  name="proteinPerKg"
+                  type="number"
+                  step="0.1"
+                  onChange={handleChange}
+                />
+                <FormInput
+                  label={t.calc.fatPerKg}
+                  name="fatPerKg"
+                  type="number"
+                  step="0.1"
+                  onChange={handleChange}
+                />
+              </div>
+
+              <FormInput
+                label={t.calc.weight}
+                name="weightKg"
+                type="number"
+                onChange={handleChange}
+              />
+            </>
+          )}
+
+          <SectionTitle title={t.calc.food} />
+          <div style={styles.grid}>
+            <FormInput
+              label={t.calc.mealsPerDay}
+              name="mealsPerDay"
+              type="number"
+              min={3}
+              max={5}
+              onChange={handleChange}
+            />
+            <FormInput
+              label={t.calc.timeToCook}
+              name="timeToCook"
+              type="number"
+              min={10}
+              max={90}
+              onChange={handleChange}
+            />
+          </div>
+
+          <FormInput
+            label={t.calc.email}
+            name="email"
+            type="email"
+            onChange={handleChange}
+          />
+
+          <label style={styles.checkboxRow}>
+            <input
+              type="checkbox"
+              name="consent"
+              onChange={handleChange}
+              style={styles.checkbox}
+            />
+            {t.calc.consent}
+          </label>
+
+          <button type="submit" disabled={loading} style={styles.submitButton}>
+            {loading ? t.calc.building : t.calc.submit}
+          </button>
+        </form>
+
+        {result && result.ok && (
+          <section style={styles.resultSection}>
+            <h2 style={styles.resultTitle}>{t.calc.results}</h2>
+            <p>BMR: {result.calc?.bmr ?? "—"} kcal/day</p>
+            <p>TDEE: {result.calc?.tdee ?? "—"} kcal/day</p>
+            <p>
+              {t.calc.targetCalories}: {result.calc?.targetCalories} kcal/day
+            </p>
+            <p>
+              Macros: Protein {result.calc?.proteinG} g • Fat{" "}
+              {result.calc?.fatG} g • Carbs {result.calc?.carbsG} g
+            </p>
+          </section>
+        )}
+      </div>
+    </main>
   );
 }
+
+/* ---------------- Subcomponents ---------------- */
+const SectionTitle: React.FC<{ title: string }> = ({ title }) => (
+  <h2 style={styles.sectionTitle}>{title}</h2>
+);
+
+interface FormInputProps
+  extends Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "onChange" | "name" | "type" | "className"
+  > {
+  label: string;
+  name: string;
+  type?: string;
+  hint?: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+}
+
+function FormInput({ label, name, type = "text", hint, onChange, ...rest }: FormInputProps) {
+  return (
+    <label style={styles.label}>
+      <span style={styles.labelTitle}>{label}</span>
+      <input name={name} type={type} onChange={onChange} {...rest} style={styles.input} />
+      {hint && <span style={styles.hint}>{hint}</span>}
+    </label>
+  );
+}
+
+type Option = { value: string; label: string };
+
+interface FormSelectProps {
+  label: string;
+  name: string;
+  options: Option[];
+  value?: string;
+  hint?: string;
+  onChange: React.ChangeEventHandler<HTMLSelectElement>;
+}
+
+function FormSelect({ label, name, options, value = "", onChange, hint }: FormSelectProps) {
+  const { t } = useI18n();
+
+  // Safe access to placeholder text
+  const placeholder =
+    (t.calc && (t.calc as Record<string, unknown>).select as string) || "Select...";
+
+  return (
+    <label style={styles.label}>
+      <span style={styles.labelTitle}>{label}</span>
+
+      <select name={name} value={value} onChange={onChange} style={styles.input}>
+        <option value="" disabled>
+          {placeholder}
+        </option>
+
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+
+      {hint && <span style={styles.hint}>{hint}</span>}
+    </label>
+  );
+}
+
+/* ---------------- Styles ---------------- */
+const styles: Record<string, CSSProperties> = {
+  main: {
+  minHeight: "100vh",
+  width: "100%",
+  overflowY: "auto",   // <- scrolling enabled
+  overflowX: "hidden", // <- no horizontal scroll
+  backgroundColor: "#1a1a1a",
+  color: "white",
+  padding: "48px 20px",
+},
+
+wrapper: {
+  maxWidth: "760px",
+  margin: "0 auto",
+  textAlign: "center",
+},
+  title: {
+    fontSize: "2.5rem",
+    fontWeight: 800,
+    textAlign: "center",
+    marginBottom: "10px",
+  },
+  subtitle: { textAlign: "center", color: "#AAA", marginBottom: "30px" },
+  modeSwitch: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "12px",
+    marginBottom: "40px",
+  },
+  modeButton: {
+    padding: "10px 22px",
+    borderRadius: "10px",
+    fontWeight: 700,
+    background: "transparent",
+    border: "1px solid #555",
+    color: "white",
+    cursor: "pointer",
+  },
+  modeButtonActive: {
+    backgroundColor: "#EF4444",
+    color: "black",
+    borderColor: "#EF4444",
+  },
+  form: {
+    backgroundColor: "#212121",
+    borderRadius: "20px",
+    padding: "40px",
+    boxShadow: "0 0 20px rgba(0,0,0,0.3)",
+  },
+  grid: {
+    display: "grid",
+    gap: "20px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+  },
+  label: { display: "flex", flexDirection: "column", fontSize: "14px" },
+  labelTitle: { color: "#EEE", marginBottom: "5px", fontWeight: 500 },
+  input: {
+    backgroundColor: "#2A2A2A",
+    border: "1px solid #555",
+    borderRadius: "8px",
+    padding: "10px",
+    color: "white",
+    fontSize: "14px",
+    outline: "none",
+  },
+  hint: { color: "#999", fontSize: "12px", marginTop: "4px" },
+  checkboxRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    fontSize: "14px",
+    color: "#CCC",
+  },
+  checkbox: { accentColor: "#EF4444" },
+  submitButton: {
+    width: "100%",
+    backgroundColor: "#EF4444",
+    color: "black",
+    fontWeight: 700,
+    border: "none",
+    borderRadius: "10px",
+    padding: "14px",
+    marginTop: "20px",
+    cursor: "pointer",
+  },
+  resultSection: {
+    marginTop: "40px",
+    backgroundColor: "#212121",
+    borderRadius: "20px",
+    padding: "40px",
+    boxShadow: "0 0 15px rgba(0,0,0,0.2)",
+  },
+  resultTitle: { color: "#EF4444", fontSize: "20px", marginBottom: "10px" },
+  sectionTitle: {
+    color: "#EF4444",
+    fontSize: "18px",
+    fontWeight: 600,
+    borderBottom: "1px solid #444",
+    paddingBottom: "5px",
+    marginBottom: "15px",
+  },
+  orText: { textAlign: "center", color: "#777", margin: "10px 0" },
+};

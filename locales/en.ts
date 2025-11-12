@@ -1,0 +1,76 @@
+export default {
+  brand: "DonetsFit",
+  home: {
+    back: "← Back to DonetsFit.com",
+    instagram: "Instagram",
+    goCalc: "Go to Calculator →",
+    intro: "Welcome to the DonetsFit calculator intro. Jump in to generate your weekly meal plan and grocery list in minutes."
+  },
+  calc: {
+    title: "DonetsFit Calculator",
+    subtitle: "Calories, macros, a 7-day meal plan, grocery list, and optional training.",
+    mode: { student: "Student (Auto)", trainer: "Trainer (Pro)" },
+    basics: "Basics",
+    sex: "Sex",
+    male: "Male",
+    female: "Femail",
+    select: "Select...",
+    age: "Age",
+    height: "Height (cm)",
+    weight: "Weight (kg)",
+    activity: "Activity",
+    goal: "Goal",
+    activityLevels: {
+      sedentary: "Sedentary (little exercise)",
+      light: "Light (1–3x/week)",
+      moderate: "Moderate (3–5x/week)",
+      very: "Very active (6–7x/week)",
+      athlete: "Athlete (intense training)",
+    },
+
+    goals: {
+      lose: "Lose weight",
+      maintain: "Maintain",
+      gain: "Gain muscle",
+    },
+    food: "Food preferences",
+    dietType: "Diet type",
+    mealsPerDay: "Meals per day",
+    timeToCook: "Time to cook",
+    exclusions: "Exclusions (allergens)",
+    cuisines: "Cuisine likes",
+    favorites: "Favorite ingredients (add multiple)",
+    training: "Training",
+    daysPerWeek: "Days per week",
+    equipment: "Equipment",
+    preferredActivities: "Preferred activities (comma)",
+    delivery: "Delivery",
+    name: "Name",
+    email: "Email",
+    consent: "I agree to receive my plan by email.",
+    submit: "Generate plan",
+    building: "Building your plan…",
+    results: "Your results",
+    mealPlan: "Meal plan (preview)",
+    grocery: "Grocery list",
+    trainingPlan: "Training plan",
+    // Trainer fields:
+    proTargets: "Coach targets",
+    targetCalories: "Target calories (kcal/day)",
+    proteinG: "Protein (g/day)",
+    fatG: "Fat (g/day)",
+    or: "or",
+    proteinPerKg: "Protein (g/kg)",
+    fatPerKg: "Fat (g/kg)",
+    perMealNote: "We’ll try to fit each meal near your per-meal target."
+  },
+  
+  email: {
+    subjectPreview: "Your DonetsFit weekly plan is ready 💪",
+    dailyTargets: "Your daily targets",
+    mealPlan: "7-day Meal Plan",
+    grocery: "Grocery List",
+    trainingPlan: "Training Plan",
+    disclaimer: "This plan is for educational purposes and general guidance only. It is not medical advice."
+  }
+} as const;

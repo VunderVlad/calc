@@ -1,8 +1,12 @@
 // app/page.tsx
+"use client";
+
 import Link from "next/link";
+import { useI18n } from "@/lib/i18n";
 
 export default function Home() {
-  // Tiny global reset without styled-jsx (safe in Server Components)
+  const { t, lang } = useI18n(); // <-- translation hook
+
   const reset = `
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
@@ -11,9 +15,9 @@ export default function Home() {
   const red = "#ff4d4d";
 
   const page: React.CSSProperties = {
-    position: "fixed", // ensures full-bleed background even if body has default margins
+    position: "fixed",
     inset: 0,
-    backgroundColor: "#1a1a1a", // full-screen gray-dark bg
+    backgroundColor: "#1a1a1a",
     color: "#fff",
     display: "flex",
     alignItems: "center",
@@ -83,12 +87,12 @@ export default function Home() {
 
   return (
     <>
-      {/* Global reset (plain <style>, NOT styled-jsx) */}
       <style
         dangerouslySetInnerHTML={{ __html: reset }}
         suppressHydrationWarning
       />
-      <main style={page}>
+
+      <main key={lang} style={page}>
         <div style={content}>
           <h1 style={brand}>
             Donets<span style={redSpan}>Fit</span>
@@ -97,9 +101,7 @@ export default function Home() {
           <div style={bar} />
 
           <p style={sub}>
-            Welcome to the <span style={redSpan}>DonetsFit</span> calculator
-            intro. Jump in to generate your weekly <strong>meal plan</strong> and{" "}
-            <strong>grocery list</strong> in minutes.
+            {t.home.intro.replace("DonetsFit", "DonetsFit")} 
           </p>
 
           <div style={links}>
@@ -109,7 +111,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              ← Back to DonetsFit.com
+              {t.home.back}
             </a>
 
             <a
@@ -118,11 +120,11 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Instagram
+              {t.home.instagram}
             </a>
 
-            <Link href="/calculator" style={btnPrimary} aria-label="Open Calculator">
-              Go to Calculator →
+            <Link href="/calculator" style={btnPrimary}>
+              {t.home.goCalc}
             </Link>
           </div>
         </div>

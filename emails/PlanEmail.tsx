@@ -1,271 +1,218 @@
-// emails/PlanEmail.tsx
 import * as React from "react";
-import {
-  Html,
-  Head,
-  Preview,
-  Body,
-  Container,
-  Section,
-  Heading,
-  Text,
-  Hr,
-  Img,
-  Link,
-} from "@react-email/components";
+import en from "@/locales/en";
+import sk from "@/locales/sk";
+import ua from "@/locales/ua";
 
-type Meal = { name: string; calories: number };
-interface DayPlan { day: string; meals: Meal[]; total: number }
-interface TrainingDay { day: string; title: string; exercises: string[] }
+export type Lang = "en" | "sk" | "ua";
 
-interface Props {
-  name?: string;
-  sex: "male" | "female";
-  age: number;
-  heightCm: number;
-  weightKg: number;
-  activity: string;
-  goal: string;
-  bmr: number;
-  tdee: number;
-  targetCalories: number;
-  proteinG: number;
-  fatG: number;
-  carbsG: number;
-  weekPlan: DayPlan[];
-  grocery: string[];
-  training: TrainingDay[];
-  /**
-   * Optional: absolute URL to coach image shown in the header.
-   * If you don’t pass it, a sensible default is used.
-   */
-  coachImageUrl?: string;
-  /**
-   * Optional: Instagram profile link. Defaults to DonetsFit.
-   */
-  instagramUrl?: string;
-}
+export type PlanEmailProps = {
+  lang?: Lang;
+  calc: {
+    targetCalories: number;
+    proteinG: number;
+    fatG: number;
+    carbsG: number;
+  };
+  weekPlan?: any[];
+  grocery?: string[];
+};
 
-export default function PlanEmail(props: Props) {
-  const {
-    name = "athlete",
-    sex,
-    age,
-    heightCm,
-    weightKg,
-    activity,
-    goal,
-    bmr,
-    tdee,
-    targetCalories,
-    proteinG,
-    fatG,
-    carbsG,
-    weekPlan,
-    grocery,
-    training,
-    coachImageUrl = "https://donetsfit.com/Assets/coach.webp",
-    instagramUrl = "https://instagram.com/donetsfit",
-  } = props;
-
-  // palette
-  const red = "#ff4d4d";
-  const dark = "#0f0f10";
-  const gray = "#f6f9fc";
-  const text = "#111827";
-  const subtle = "#6b7280";
-  const cardBorder = "1px solid #e5e7eb";
+/**
+ * Localized email template using translations from /locales
+ */
+export default function PlanEmail({
+  lang = "en",
+  calc,
+  weekPlan = [],
+  grocery = [],
+}: PlanEmailProps) {
+  const dict = lang === "sk" ? sk : lang === "ua" ? ua : en;
+  const t = dict.email;
+  const brand = dict.brand;
 
   return (
-    <Html>
-      <Head />
-      <Preview>Your DonetsFit weekly plan is ready 💪</Preview>
-
-      <Body style={{ margin: 0, backgroundColor: gray, fontFamily: "Arial, sans-serif", color: text }}>
-        <Container style={{ width: "100%", maxWidth: 720, padding: "0 12px", margin: "0 auto" }}>
-
-          {/* Header / Hero */}
-          <Section
-            style={{
-              backgroundColor: dark,
-              color: "#ffffff",
-              borderRadius: "14px",
-              marginTop: 20,
-              overflow: "hidden",
-            }}
-          >
-            <div style={{ display: "flex", gap: 16, padding: 20, alignItems: "center" }}>
-              <div>
-                <Img
-                  src={coachImageUrl}
-                  alt="Your coach"
-                  width="72"
-                  height="72"
+    <html>
+      <body
+        style={{
+          fontFamily: "Arial, sans-serif",
+          background: "#fafafa",
+          color: "#111",
+          padding: "20px",
+        }}
+      >
+        <table
+          width="100%"
+          cellPadding={0}
+          cellSpacing={0}
+          style={{
+            maxWidth: 640,
+            margin: "0 auto",
+            background: "#ffffff",
+            borderRadius: 8,
+            boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+            overflow: "hidden",
+          }}
+        >
+          <thead>
+            <tr>
+              <td
+                style={{
+                  background: "#ff4d4d",
+                  color: "#fff",
+                  fontSize: 22,
+                  fontWeight: 700,
+                  textAlign: "center",
+                  padding: "16px",
+                }}
+              >
+                {t.subjectPreview}
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: "24px 32px" }}>
+                {/* Title */}
+                <p
                   style={{
-                    display: "block",
-                    width: 72,
-                    height: 72,
-                    borderRadius: "50%",
-                    border: `2px solid ${red}`,
-                    objectFit: "cover",
-                    backgroundColor: "#1a1a1a",
+                    fontSize: 18,
+                    fontWeight: 700,
+                    marginBottom: 12,
                   }}
-                />
-              </div>
-              <div style={{ flex: 1 }}>
-                <Heading as="h2" style={{ margin: 0, color: "#ffffff", fontSize: 22, lineHeight: "28px" }}>
-                  Hey {name}, your personal Donets<span style={{ color: red }}>Fit</span> plan is here 🎯
-                </Heading>
-                <Text style={{ margin: "6px 0 0", color: "#d1d5db", fontSize: 14, lineHeight: "20px" }}>
-                  If you have any questions, reply to this email or DM me on{" "}
-                  <Link href={instagramUrl} style={{ color: red, textDecoration: "underline" }}>
-                    Instagram
-                  </Link>
-                  . I’m happy to help.
-                </Text>
-              </div>
-            </div>
-          </Section>
+                >
+                  {brand}
+                </p>
 
-          {/* Profile snapshot */}
-          <Section
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: 12,
-              padding: 16,
-              marginTop: 14,
-              border: cardBorder,
-            }}
-          >
-            <Text style={{ margin: 0, fontSize: 14, color: subtle }}>
-              Goal: <b style={{ color: text }}>{goal}</b> &nbsp;•&nbsp; Activity: <b style={{ color: text }}>{activity}</b> &nbsp;•&nbsp; Sex: <b style={{ color: text }}>{sex}</b> &nbsp;•&nbsp; Age:{" "}
-              <b style={{ color: text }}>{age}</b>
-            </Text>
-            <Text style={{ margin: "6px 0 0", fontSize: 14, color: subtle }}>
-              Height: <b style={{ color: text }}>{heightCm} cm</b> &nbsp;•&nbsp; Weight: <b style={{ color: text }}>{weightKg} kg</b>
-            </Text>
-          </Section>
+                {/* Daily targets */}
+                <h3
+                  style={{
+                    fontSize: 18,
+                    color: "#ff4d4d",
+                    marginTop: 24,
+                    marginBottom: 8,
+                  }}
+                >
+                  {t.dailyTargets}
+                </h3>
+                <ul style={{ fontSize: 15, lineHeight: 1.6, margin: 0 }}>
+                  <li>
+                    Calories: <strong>{calc.targetCalories} kcal</strong>
+                  </li>
+                  <li>
+                    Protein: <strong>{calc.proteinG} g</strong>
+                  </li>
+                  <li>
+                    Fat: <strong>{calc.fatG} g</strong>
+                  </li>
+                  <li>
+                    Carbs: <strong>{calc.carbsG} g</strong>
+                  </li>
+                </ul>
 
-          {/* Metrics */}
-          <Section
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: 12,
-              padding: 18,
-              marginTop: 14,
-              border: cardBorder,
-            }}
-          >
-            <Heading as="h3" style={{ margin: "0 0 8px", fontSize: 18 }}>
-              Your daily targets
-            </Heading>
-            <Hr style={{ borderColor: "#eee", margin: "8px 0 14px" }} />
-            <Text style={{ margin: "0 0 6px", fontSize: 14 }}>
-              <b>BMR</b>: {bmr} kcal/day
-            </Text>
-            <Text style={{ margin: "0 0 6px", fontSize: 14 }}>
-              <b>TDEE</b>: {tdee} kcal/day
-            </Text>
-            <Text style={{ margin: "0 0 6px", fontSize: 14 }}>
-              <b>Target Calories</b>: {targetCalories} kcal/day
-            </Text>
-            <Text style={{ margin: 0, fontSize: 14 }}>
-              <b>Macros</b>: Protein {proteinG}g &nbsp;•&nbsp; Fat {fatG}g &nbsp;•&nbsp; Carbs {carbsG}g
-            </Text>
-          </Section>
+                {/* Meal Plan */}
+                {weekPlan.length > 0 && (
+                  <>
+                    <h3
+                      style={{
+                        fontSize: 18,
+                        color: "#ff4d4d",
+                        marginTop: 24,
+                        marginBottom: 8,
+                      }}
+                    >
+                      {t.mealPlan}
+                    </h3>
+                    <table
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        fontSize: 14,
+                      }}
+                    >
+                      <tbody>
+                        {weekPlan.map((day: any, idx: number) => (
+                          <tr key={idx}>
+                            <td
+                              style={{
+                                borderBottom: "1px solid #eee",
+                                padding: "6px 0",
+                                verticalAlign: "top",
+                              }}
+                            >
+                              <strong>{day.day || `Day ${idx + 1}`}</strong>:{" "}
+                              {Array.isArray(day.meals)
+                                ? day.meals.map((m: any) => m.name).join(", ")
+                                : ""}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </>
+                )}
 
-          {/* Meal Plan */}
-          <Section
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: 12,
-              padding: 18,
-              marginTop: 14,
-              border: cardBorder,
-            }}
-          >
-            <Heading as="h3" style={{ margin: "0 0 8px", fontSize: 18 }}>
-              7‑day Meal Plan
-            </Heading>
-            <Hr style={{ borderColor: "#eee", margin: "8px 0 12px" }} />
-            {weekPlan.map((d, i) => (
-              <div key={i} style={{ marginBottom: 12 }}>
-                <Text style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>
-                  {d.day} &nbsp;—&nbsp; ~{d.total} kcal
-                </Text>
-                {d.meals.map((m, j) => (
-                  <Text key={j} style={{ margin: "2px 0 0", fontSize: 14 }}>
-                    • {m.name} — {m.calories} kcal
-                  </Text>
-                ))}
-              </div>
-            ))}
-          </Section>
+                {/* Grocery List */}
+                {grocery.length > 0 && (
+                  <>
+                    <h3
+                      style={{
+                        fontSize: 18,
+                        color: "#ff4d4d",
+                        marginTop: 24,
+                        marginBottom: 8,
+                      }}
+                    >
+                      {t.grocery}
+                    </h3>
+                    <ul
+                      style={{
+                        fontSize: 14,
+                        lineHeight: 1.6,
+                        margin: 0,
+                        paddingLeft: 16,
+                      }}
+                    >
+                      {grocery.map((g, i) => (
+                        <li key={i}>{g}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
 
-          {/* Grocery List */}
-          <Section
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: 12,
-              padding: 18,
-              marginTop: 14,
-              border: cardBorder,
-            }}
-          >
-            <Heading as="h3" style={{ margin: "0 0 8px", fontSize: 18 }}>
-              Grocery List
-            </Heading>
-            <Hr style={{ borderColor: "#eee", margin: "8px 0 12px" }} />
-            {grocery.map((g, i) => (
-              <Text key={i} style={{ margin: "2px 0", fontSize: 14 }}>
-                • {g}
-              </Text>
-            ))}
-          </Section>
+                {/* Training Plan (optional) */}
+                <h3
+                  style={{
+                    fontSize: 18,
+                    color: "#ff4d4d",
+                    marginTop: 24,
+                    marginBottom: 8,
+                  }}
+                >
+                  {t.trainingPlan}
+                </h3>
+                <p style={{ fontSize: 14, color: "#555" }}>
+                  Coming soon — personalized workouts for your plan.
+                </p>
 
-          {/* Training Plan */}
-          <Section
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: 12,
-              padding: 18,
-              marginTop: 14,
-              border: cardBorder,
-            }}
-          >
-            <Heading as="h3" style={{ margin: "0 0 8px", fontSize: 18 }}>
-              Training Plan
-            </Heading>
-            <Hr style={{ borderColor: "#eee", margin: "8px 0 12px" }} />
-            {training.map((t, i) => (
-              <div key={i} style={{ marginBottom: 12 }}>
-                <Text style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>
-                  {t.day}: {t.title}
-                </Text>
-                {t.exercises.map((ex, k) => (
-                  <Text key={k} style={{ margin: "2px 0 0", fontSize: 14 }}>
-                    • {ex}
-                  </Text>
-                ))}
-              </div>
-            ))}
-          </Section>
-
-          {/* Footer note */}
-          <Section style={{ margin: "16px 0 24px" }}>
-            <Text style={{ color: subtle, fontSize: 12, lineHeight: "18px", margin: 0 }}>
-              This plan is for educational purposes and general guidance only. It is not medical advice.
-            </Text>
-            <Text style={{ color: subtle, fontSize: 12, lineHeight: "18px", margin: "6px 0 0" }}>
-              Questions? DM me on{" "}
-              <Link href={instagramUrl} style={{ color: red, textDecoration: "underline" }}>
-                Instagram
-              </Link>
-              .
-            </Text>
-          </Section>
-        </Container>
-      </Body>
-    </Html>
+                {/* Footer */}
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#777",
+                    marginTop: 32,
+                    borderTop: "1px solid #eee",
+                    paddingTop: 12,
+                  }}
+                >
+                  {t.disclaimer}
+                  <br />
+                  <strong>{brand}</strong>
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </body>
+    </html>
   );
 }
