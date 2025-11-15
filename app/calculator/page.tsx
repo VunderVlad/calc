@@ -20,6 +20,8 @@ interface ApiResult {
   };
 }
 
+type Option = { value: string; label: string };
+
 /* ---------------- Page ---------------- */
 export default function CalculatorPage() {
   const { t, lang } = useI18n();
@@ -29,15 +31,19 @@ export default function CalculatorPage() {
   const initialMode = (search.get("mode") as Mode) || "student";
   const [mode, setMode] = useState<Mode>(initialMode);
 
+  const [form, setForm] = useState<FormData>({});
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ApiResult | null>(null);
+
+  const [showAllergens, setShowAllergens] = useState(false);
+  const [showDislikes, setShowDislikes] = useState(false);
+
+  // keep URL in sync with mode
   useEffect(() => {
     const sp = new URLSearchParams(Array.from(search.entries()));
     sp.set("mode", mode);
     router.replace(`/calculator?${sp.toString()}`);
   }, [mode, search, router]);
-
-  const [form, setForm] = useState<FormData>({});
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ApiResult | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -52,24 +58,71 @@ export default function CalculatorPage() {
     setForm((prev) => ({ ...prev, [name]: val }));
   };
 
+  /* ----- option lists built from translations ----- */
+  const allergenOptions: Option[] = [
+    { value: "gluten", label: t.calc.allergensList.gluten },
+    { value: "lactose", label: t.calc.allergensList.lactose },
+    { value: "eggs", label: t.calc.allergensList.eggs },
+    { value: "nuts", label: t.calc.allergensList.nuts },
+    { value: "fish", label: t.calc.allergensList.fish },
+    { value: "soy", label: t.calc.allergensList.soy },
+    { value: "sesame", label: t.calc.allergensList.sesame },
+    { value: "corn", label: t.calc.allergensList.corn },
+    { value: "peanuts", label: t.calc.allergensList.peanuts },
+    { value: "shellfish", label: t.calc.allergensList.shellfish },
+    { value: "celery", label: t.calc.allergensList.celery },
+    { value: "sulfites", label: t.calc.allergensList.sulfites },
+    { value: "mustard", label: t.calc.allergensList.mustard },
+  ];
+
+  const dislikeOptions: Option[] = [
+    { value: "spicy", label: t.calc.dislikesList.spicy },
+    { value: "mushrooms", label: t.calc.dislikesList.mushrooms },
+    { value: "olives", label: t.calc.dislikesList.olives },
+    { value: "coriander", label: t.calc.dislikesList.coriander },
+    { value: "cottageCheese", label: t.calc.dislikesList.cottageCheese },
+    { value: "seafood", label: t.calc.dislikesList.seafood },
+    { value: "liver", label: t.calc.dislikesList.liver },
+    { value: "broccoli", label: t.calc.dislikesList.broccoli },
+    { value: "cauliflower", label: t.calc.dislikesList.cauliflower },
+    { value: "beans", label: t.calc.dislikesList.beans },
+    { value: "tofu", label: t.calc.dislikesList.tofu },
+    { value: "darkChocolate", label: t.calc.dislikesList.darkChocolate },
+  ];
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setResult(null);
 
+    // convert checkbox booleans into arrays of selected keys
+    const allergens = allergenOptions
+      .filter((opt) => form[`allergen_${opt.value}`] === true)
+      .map((opt) => opt.value);
+
+    const dislikes = dislikeOptions
+      .filter((opt) => form[`dislike_${opt.value}`] === true)
+      .map((opt) => opt.value);
+
+    const emailLang =
+      (form.emailLang as string | undefined) || lang; // default to current UI language
+
     const payload = {
       mode,
+      lang,
       ...form,
       age: Number(form.age) || undefined,
       heightCm: Number(form.heightCm) || undefined,
       weightKg: Number(form.weightKg) || undefined,
       mealsPerDay: Number(form.mealsPerDay) || undefined,
-      timeToCook: Number(form.timeToCook) || undefined,
       targetCalories: Number(form.targetCalories) || undefined,
       proteinG: Number(form.proteinG) || undefined,
       fatG: Number(form.fatG) || undefined,
       proteinPerKg: Number(form.proteinPerKg) || undefined,
       fatPerKg: Number(form.fatPerKg) || undefined,
+      allergens,
+      dislikes,
+      emailLang,
     };
 
     try {
@@ -119,6 +172,7 @@ export default function CalculatorPage() {
         <form onSubmit={handleSubmit} style={styles.form}>
           {mode === "student" ? (
             <>
+              {/* BASIC INFO */}
               <SectionTitle title={t.calc.basics} />
               <div style={styles.grid}>
                 <FormSelect
@@ -153,6 +207,7 @@ export default function CalculatorPage() {
                 />
               </div>
 
+              {/* ACTIVITY & GOAL */}
               <SectionTitle title={`${t.calc.activity} & ${t.calc.goal}`} />
 
               <FormSelect
@@ -183,6 +238,7 @@ export default function CalculatorPage() {
             </>
           ) : (
             <>
+              {/* COACH / PRO TARGETS */}
               <SectionTitle title={t.calc.proTargets} />
               <FormInput
                 label={t.calc.targetCalories}
@@ -212,14 +268,14 @@ export default function CalculatorPage() {
                   label={t.calc.proteinPerKg}
                   name="proteinPerKg"
                   type="number"
-                  step="0.1"
+                  step={0.1}
                   onChange={handleChange}
                 />
                 <FormInput
                   label={t.calc.fatPerKg}
                   name="fatPerKg"
                   type="number"
-                  step="0.1"
+                  step={0.1}
                   onChange={handleChange}
                 />
               </div>
@@ -233,6 +289,7 @@ export default function CalculatorPage() {
             </>
           )}
 
+          {/* FOOD PREFERENCES */}
           <SectionTitle title={t.calc.food} />
           <div style={styles.grid}>
             <FormInput
@@ -243,21 +300,84 @@ export default function CalculatorPage() {
               max={5}
               onChange={handleChange}
             />
-            <FormInput
-              label={t.calc.timeToCook}
-              name="timeToCook"
-              type="number"
-              min={10}
-              max={90}
-              onChange={handleChange}
-            />
           </div>
 
+          {/* ALLERGENS – collapsible */}
+          <div
+            style={styles.expandBar}
+            onClick={() => setShowAllergens((prev) => !prev)}
+          >
+            <span>{t.calc.allergensSection}</span>
+            <span>{showAllergens ? "▲" : "▼"}</span>
+          </div>
+          {showAllergens && (
+            <div style={styles.checkboxGrid}>
+              {allergenOptions.map((opt) => {
+                const field = `allergen_${opt.value}`;
+                const checked = Boolean(form[field]);
+                return (
+                  <label key={opt.value} style={styles.checkboxItem}>
+                    <input
+                      type="checkbox"
+                      name={field}
+                      checked={checked}
+                      onChange={handleChange}
+                      style={styles.checkbox}
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+
+          {/* DISLIKES – collapsible */}
+          <div
+            style={styles.expandBar}
+            onClick={() => setShowDislikes((prev) => !prev)}
+          >
+            <span>{t.calc.dislikesSection}</span>
+            <span>{showDislikes ? "▲" : "▼"}</span>
+          </div>
+          {showDislikes && (
+            <div style={styles.checkboxGrid}>
+              {dislikeOptions.map((opt) => {
+                const field = `dislike_${opt.value}`;
+                const checked = Boolean(form[field]);
+                return (
+                  <label key={opt.value} style={styles.checkboxItem}>
+                    <input
+                      type="checkbox"
+                      name={field}
+                      checked={checked}
+                      onChange={handleChange}
+                      style={styles.checkbox}
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+
+          {/* EMAIL + EMAIL LANGUAGE + CONSENT */}
           <FormInput
             label={t.calc.email}
             name="email"
             type="email"
             onChange={handleChange}
+          />
+
+          <FormSelect
+            label={t.calc.emailLanguageLabel}
+            name="emailLang"
+            value={String(form.emailLang ?? lang)}
+            onChange={handleChange}
+            options={[
+              { value: "en", label: t.calc.emailLanguageOptions.en },
+              { value: "sk", label: t.calc.emailLanguageOptions.sk },
+              { value: "ua", label: t.calc.emailLanguageOptions.ua },
+            ]}
           />
 
           <label style={styles.checkboxRow}>
@@ -311,17 +431,28 @@ interface FormInputProps
   onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
-function FormInput({ label, name, type = "text", hint, onChange, ...rest }: FormInputProps) {
+function FormInput({
+  label,
+  name,
+  type = "text",
+  hint,
+  onChange,
+  ...rest
+}: FormInputProps) {
   return (
     <label style={styles.label}>
       <span style={styles.labelTitle}>{label}</span>
-      <input name={name} type={type} onChange={onChange} {...rest} style={styles.input} />
+      <input
+        name={name}
+        type={type}
+        onChange={onChange}
+        {...rest}
+        style={styles.input}
+      />
       {hint && <span style={styles.hint}>{hint}</span>}
     </label>
   );
 }
-
-type Option = { value: string; label: string };
 
 interface FormSelectProps {
   label: string;
@@ -332,18 +463,27 @@ interface FormSelectProps {
   onChange: React.ChangeEventHandler<HTMLSelectElement>;
 }
 
-function FormSelect({ label, name, options, value = "", onChange, hint }: FormSelectProps) {
+function FormSelect({
+  label,
+  name,
+  options,
+  value = "",
+  onChange,
+  hint,
+}: FormSelectProps) {
   const { t } = useI18n();
-
-  // Safe access to placeholder text
-  const placeholder =
-    (t.calc && (t.calc as Record<string, unknown>).select as string) || "Select...";
+  const placeholder = t.calc.select || "Select...";
 
   return (
     <label style={styles.label}>
       <span style={styles.labelTitle}>{label}</span>
 
-      <select name={name} value={value} onChange={onChange} style={styles.input}>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        style={styles.input}
+      >
         <option value="" disabled>
           {placeholder}
         </option>
@@ -363,20 +503,19 @@ function FormSelect({ label, name, options, value = "", onChange, hint }: FormSe
 /* ---------------- Styles ---------------- */
 const styles: Record<string, CSSProperties> = {
   main: {
-  minHeight: "100vh",
-  width: "100%",
-  overflowY: "auto",   // <- scrolling enabled
-  overflowX: "hidden", // <- no horizontal scroll
-  backgroundColor: "#1a1a1a",
-  color: "white",
-  padding: "48px 20px",
-},
-
-wrapper: {
-  maxWidth: "760px",
-  margin: "0 auto",
-  textAlign: "center",
-},
+    minHeight: "100vh",
+    width: "100%",
+    overflowY: "auto",
+    overflowX: "hidden",
+    backgroundColor: "#1a1a1a",
+    color: "white",
+    padding: "48px 20px",
+  },
+  wrapper: {
+    maxWidth: "760px",
+    margin: "0 auto",
+    textAlign: "center",
+  },
   title: {
     fontSize: "2.5rem",
     fontWeight: 800,
@@ -394,8 +533,10 @@ wrapper: {
     padding: "10px 22px",
     borderRadius: "10px",
     fontWeight: 700,
-    background: "transparent",
-    border: "1px solid #555",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#555",
     color: "white",
     cursor: "pointer",
   },
@@ -416,7 +557,7 @@ wrapper: {
     gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
   },
   label: { display: "flex", flexDirection: "column", fontSize: "14px" },
-  labelTitle: { color: "#EEE", marginBottom: "5px", fontWeight: 500 },
+  labelTitle: { color: "#EEE", marginBottom: "8px", marginTop: "12px", fontWeight: 500,textAlign: "left"  },
   input: {
     backgroundColor: "#2A2A2A",
     border: "1px solid #555",
@@ -433,6 +574,7 @@ wrapper: {
     gap: "8px",
     fontSize: "14px",
     color: "#CCC",
+    marginTop: "16px",
   },
   checkbox: { accentColor: "#EF4444" },
   submitButton: {
@@ -463,4 +605,34 @@ wrapper: {
     marginBottom: "15px",
   },
   orText: { textAlign: "center", color: "#777", margin: "10px 0" },
+
+  /* collapsible bar + grid for checkboxes */
+  expandBar: {
+    marginTop: "18px",
+    marginBottom: "4px",
+    padding: "10px 14px",
+    borderRadius: 10,
+    border: "1px solid #333",
+    backgroundColor: "#181818",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    fontSize: 14,
+    cursor: "pointer",
+  },
+  checkboxGrid: {
+    marginTop: "10px",
+    marginBottom: "10px",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: "8px 16px",
+    textAlign: "left",
+  },
+  checkboxItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    fontSize: 13,
+    color: "#ddd",
+  },
 };

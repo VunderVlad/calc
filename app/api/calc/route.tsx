@@ -1,8 +1,9 @@
+// app/api/calc/route.ts
 import * as React from "react";
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import { z, type ZodObject, type ZodRawShape } from "zod";
 
-import { calculateAll as computeAll } from "@/lib/calc";
+import { calculateAll, type CalcInput } from "@/lib/calc";
 import { buildWeekPlan } from "@/lib/meal";
 import PlanEmail from "@/emails/PlanEmail";
 import { Resend } from "resend";
@@ -21,23 +22,21 @@ const SEND_EMAIL =
 /* -------------------------------------------------------
    Validation Schemas
 ------------------------------------------------------- */
-import { type ZodObject, type ZodRawShape } from "zod";
-
-// Explicitly typed base schema (no yellow or red)
 const baseDiet = z.object({
   mealsPerDay: z.number().int().min(3).max(5),
-  timeToCook: z.number().int().min(10).max(90),
+  timeToCook: z.number().int().min(10).max(90).default(30),
   dietType: z.enum(["none", "vegetarian", "vegan", "keto"]).default("none"),
   exclusions: z.array(z.string()).default([]),
   cuisineLikes: z.array(z.string()).default([]),
   favoriteIngredients: z.array(z.string()).default([]),
+  allergens: z.array(z.string()).default([]),
+  dislikes: z.array(z.string()).default([]),
   name: z.string().optional(),
   email: z.string().email().optional(),
   consent: z.boolean().default(false),
   lang: z.enum(["en", "sk", "ua"]).default("en"),
 }) satisfies ZodObject<ZodRawShape>;
 
-// ✅ Use `.extend()` instead of `.merge()` — cleaner, fully typed
 const studentPayload = baseDiet.extend({
   mode: z.literal("student"),
   sex: z.enum(["male", "female"]),
@@ -58,21 +57,22 @@ const trainerPayload = baseDiet.extend({
   weightKg: z.number().min(35).max(300).optional(),
 });
 
-// ✅ Discriminated union across both
 export const payloadSchema = z.discriminatedUnion("mode", [
   studentPayload,
   trainerPayload,
 ]);
 
-// ✅ Strong, automatically inferred types
 export type Payload = z.infer<typeof payloadSchema>;
 export type StudentPayload = z.infer<typeof studentPayload>;
 export type TrainerPayload = z.infer<typeof trainerPayload>;
 
-
 /* -------------------------------------------------------
    Types
 ------------------------------------------------------- */
+type MealIngredient = { name?: string; amount?: number };
+type Meal = { ingredients?: MealIngredient[] };
+type Day = { meals?: Meal[] };
+
 interface CalcOut {
   bmr: number | null;
   tdee: number | null;
@@ -85,26 +85,20 @@ interface CalcOut {
 /* -------------------------------------------------------
    Helpers
 ------------------------------------------------------- */
-function buildGroceryFromWeek(week: unknown[]): string[] {
+function buildGroceryFromWeek(week: Day[]): string[] {
   const acc = new Map<string, number>();
+
   for (const day of week ?? []) {
-    if (
-      typeof day === "object" &&
-      day !== null &&
-      "meals" in (day as Record<string, unknown>)
-    ) {
-      const meals = (day as Record<string, unknown>)["meals"] as
-        | { ingredients?: { name?: string; amount?: number }[] }[]
-        | undefined;
-      for (const meal of meals ?? []) {
-        for (const ing of meal.ingredients ?? []) {
-          if (!ing?.name || !ing?.amount) continue;
-          acc.set(ing.name, (acc.get(ing.name) ?? 0) + ing.amount);
-        }
+    const meals = day?.meals ?? [];
+    for (const meal of meals) {
+      for (const ing of meal.ingredients ?? []) {
+        if (!ing?.name || !ing?.amount) continue;
+        acc.set(ing.name, (acc.get(ing.name) ?? 0) + ing.amount);
       }
     }
   }
-  return Array.from(acc.entries()).map(
+
+  return [...acc.entries()].map(
     ([name, amount]) => `${name} — ${Math.round(amount)} g`
   );
 }
@@ -116,16 +110,9 @@ export async function POST(req: Request) {
   try {
     const raw = await req.json();
 
-    if (!raw || typeof raw !== "object") {
-      return NextResponse.json(
-        { ok: false, message: "Invalid or empty request body." },
-        { status: 400 }
-      );
-    }
-
     const parsed = payloadSchema.safeParse(raw);
     if (!parsed.success) {
-      console.error("❌ Validation failed:", parsed.error.format());
+      console.error("❌ Validation failed:", parsed.error.flatten());
       return NextResponse.json(
         {
           ok: false,
@@ -142,17 +129,23 @@ export async function POST(req: Request) {
     /* ---------- Student ---------- */
     if (body.mode === "student") {
       const s = body as StudentPayload;
-      calc = computeAll({
+
+      const calcInput: CalcInput = {
         sex: s.sex,
         age: s.age,
         heightCm: s.heightCm,
         weightKg: s.weightKg,
         activity: s.activity,
         goal: s.goal,
-      });
-    } else {
-      /* ---------- Trainer ---------- */
+      };
+
+      calc = calculateAll(calcInput);
+    }
+
+    /* ---------- Trainer ---------- */
+    else {
       const t = body as TrainerPayload;
+
       const target = t.targetCalories;
 
       let proteinG = t.proteinG ?? null;
@@ -189,52 +182,39 @@ export async function POST(req: Request) {
       };
     }
 
-    /* ---------- Meal plan & grocery ---------- *//* ---------- Meal plan & grocery ---------- */
-      const favorites: string[] = Array.isArray(body.favoriteIngredients)
-        ? body.favoriteIngredients
-        : [];
+    /* ---------- Meal plan ---------- */
+    const dietTags =
+      body.dietType && body.dietType !== "none"
+        ? [body.dietType]
+        : undefined;
 
-      const dietTags =
-        body.dietType && body.dietType !== "none" ? [body.dietType] : undefined;
+    const weekPlan = buildWeekPlan({
+      targetCalories: calc.targetCalories,
+      mealsPerDay: body.mealsPerDay,
+      timeToCook: body.timeToCook ?? 30,
+      favorites: body.favoriteIngredients,
+      dietTags,
+      exclusions: [...body.exclusions, ...body.allergens, ...body.dislikes],
+      cuisineLikes: body.cuisineLikes,
+    });
 
-      const exclusions: string[] = Array.isArray(body.exclusions)
-        ? body.exclusions
-        : [];
+    let grocery: string[] = [];
 
-      const cuisineLikes: string[] = Array.isArray(body.cuisineLikes)
-        ? body.cuisineLikes
-        : [];
-
-      const weekPlan = buildWeekPlan({
-        targetCalories: calc.targetCalories,
-        mealsPerDay: body.mealsPerDay,
-        timeToCook: body.timeToCook,
-        favorites,
-        dietTags,
-        exclusions,
-        cuisineLikes,
-      });
-
-      // Safe grocery extraction
-      let grocery: string[] = [];
+    if (Array.isArray(weekPlan)) {
+      // weekPlan is an array of days
+      grocery = buildGroceryFromWeek(weekPlan as Day[]);
+    } else if (weekPlan && typeof weekPlan === "object") {
+      // weekPlan is an object that may contain a grocery array
+      const maybeGrocery = (weekPlan as { grocery?: unknown }).grocery;
 
       if (
-        weekPlan &&
-        typeof weekPlan === "object" &&
-        "grocery" in weekPlan
+        Array.isArray(maybeGrocery) &&
+        maybeGrocery.every((x): x is string => typeof x === "string")
       ) {
-        const maybeGrocery = (weekPlan as { grocery?: unknown }).grocery;
-        if (Array.isArray(maybeGrocery) && maybeGrocery.every((x) => typeof x === "string")) {
-          grocery = maybeGrocery;
-        }
-      } else if (Array.isArray(weekPlan)) {
-        grocery = buildGroceryFromWeek(weekPlan);
-      } else {
-        grocery = [];
+        grocery = maybeGrocery;
       }
-
-
-    /* ---------- Optional email ---------- */
+    }
+    /* ---------- Optional Email ---------- */
     let emailId: string | null = null;
 
     if (
@@ -244,38 +224,35 @@ export async function POST(req: Request) {
       body.consent &&
       process.env.FROM_EMAIL
     ) {
-      try {
-        const { data, error } = await resend.emails.send({
-          from: process.env.FROM_EMAIL!,
-          to: body.email,
-          subject:
-            body.lang === "sk"
-              ? "Váš týždenný plán DonetsFit 💪"
-              : body.lang === "ua"
-              ? "Ваш тижневий план DonetsFit 💪"
-              : "Your DonetsFit Weekly Plan 💪",
-          react: React.createElement(PlanEmail, {
-            calc,
-            weekPlan,
-            grocery: grocery ?? [],
-            lang: body.lang,
-          }),
-        });
-        if (error) console.error("Email send failed:", error);
-        emailId = data?.id ?? null;
-      } catch (err) {
-        console.error("Email send failed:", err);
-      }
+      const subject =
+        body.lang === "sk"
+          ? "Váš týždenný plán DonetsFit 💪"
+          : body.lang === "ua"
+          ? "Ваш тижневий план DonetsFit 💪"
+          : "Your DonetsFit Weekly Plan 💪";
+
+      const { data, error } = await resend.emails.send({
+        from: process.env.FROM_EMAIL!,
+        to: body.email,
+        subject,
+        react: React.createElement(PlanEmail, {
+          calc,
+          weekPlan,
+          grocery,
+          lang: body.lang,
+        }),
+      });
+
+      if (error) console.error(error);
+      emailId = data?.id ?? null;
     }
 
-    /* ---------- Response ---------- */
     return NextResponse.json({
       ok: true,
       mode: body.mode,
       calc,
       weekPlan,
       grocery,
-      training: null,
       emailId,
     });
   } catch (err) {
