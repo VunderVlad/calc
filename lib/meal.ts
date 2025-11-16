@@ -1,180 +1,229 @@
-// lib/meal.ts
-import { RECIPES, Recipe } from "@/data/recipes";
+// lib/meal.ts — PRO VERSION (NO CUISINE)
 
-export type DietType = "none" | "vegetarian" | "vegan" | "keto";
+import {
+  RECIPES,
+  Recipe,
+  MealType,
+  AllergenKey,
+  DislikeKey,
+  DietTag,
+} from "@/data/recipes";
 
-type Meal = { name: string; calories: number };
-export type DayPlan = { day: string; meals: Meal[]; total: number };
-
-// --------------------
-// Helpers
-// --------------------
-function allowedByDiet(r: Recipe, diet: DietType): boolean {
-  if (diet === "none") return true;
-  if (diet === "vegetarian")
-    return r.dietTags.includes("vegetarian") || r.dietTags.includes("vegan");
-  if (diet === "vegan") return r.dietTags.includes("vegan");
-  if (diet === "keto") return r.dietTags.includes("keto");
-  return true;
-}
-
-function matchesCuisine(r: Recipe, likes: string[]): boolean {
-  if (!likes.length) return true;
-  const c = (r.cuisine ?? "").toString().toLowerCase();
-  return likes.some((l) => c.includes(l.toLowerCase()));
-}
-
-function excludesAllergens(r: Recipe, exclusions: string[]): boolean {
-  if (!exclusions.length) return true;
-  const all = (r.allergens ?? []).map((a) => a.toLowerCase());
-  return !exclusions.some((e) => all.includes(e.toLowerCase()));
-}
-
-function includesFavorite(r: Recipe, favorites: string[]): boolean {
-  if (!favorites.length) return true;
-  const ingredients = (r.ingredients ?? []).map((i) => i.toLowerCase());
-  return favorites.some((f) => ingredients.includes(f.toLowerCase()));
-}
-
-// --------------------
-// Filtering
-// --------------------
-export function filterRecipes(opts: {
-  dietType: DietType;
-  exclusions: string[];
-  timeToCook: number; // minutes (we compare <=)
-  cuisineLikes: string[];
-  favorites?: string[];
-}): Recipe[] {
-  const { dietType, exclusions, timeToCook, cuisineLikes, favorites = [] } = opts;
-
-  return RECIPES.filter(
-    (r) =>
-      allowedByDiet(r, dietType) &&
-      excludesAllergens(r, exclusions) &&
-      (Number.isFinite(timeToCook) ? r.cookTime <= timeToCook : true) &&
-      matchesCuisine(r, cuisineLikes) &&
-      includesFavorite(r, favorites)
-  );
-}
-
-// --------------------
-// Planner
-// --------------------
-export function buildWeekPlan(opts: {
+export interface BuildWeekPlanInput {
   targetCalories: number;
   mealsPerDay: number;
   timeToCook: number;
   favorites?: string[];
-  dietTags?: string[];
+  dietTags?: string[] | DietTag[];
   exclusions?: string[];
-  cuisineLikes?: string[];
-}): DayPlan[] {
-  const {
-    targetCalories,
-    mealsPerDay,
-    timeToCook,
-    favorites = [],
-    dietTags = [],
-    exclusions = [],
-    cuisineLikes = [],
-  } = opts;
-
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-  // Combine dietTags into a primary dietType for compatibility with older logic
-  const primaryDiet: DietType = (dietTags[0] as DietType) || "none";
-
-  // 1) Try strict filter
-  let pool = filterRecipes({
-    dietType: primaryDiet,
-    exclusions,
-    timeToCook,
-    cuisineLikes,
-    favorites,
-  });
-
-  // 2) Graceful fallbacks if pool is empty
-  if (pool.length === 0) {
-    pool = filterRecipes({
-      dietType: primaryDiet,
-      exclusions,
-      timeToCook,
-      cuisineLikes: [],
-      favorites,
-    });
-  }
-  if (pool.length === 0) {
-    pool = filterRecipes({
-      dietType: primaryDiet,
-      exclusions,
-      timeToCook: 999,
-      cuisineLikes: [],
-      favorites,
-    });
-  }
-  if (pool.length === 0) {
-    pool = RECIPES.slice(); // fallback to everything
-  }
-
-  const perMeal = targetCalories / mealsPerDay;
-  const minC = perMeal * 0.75;
-  const maxC = perMeal * 1.25;
-
-  const used: Record<string, number> = {};
-
-  function pickMeal(): Recipe {
-    const withinRange = pool.filter(
-      (r) => r.calories >= minC && r.calories <= maxC
-    );
-    const list = (withinRange.length ? withinRange : pool).filter(
-      (r) => (used[r.id] || 0) < 2 // avoid repeating too often
-    );
-    const effective = list.length ? list : pool;
-
-    // Prefer recipes with favorite ingredients
-    effective.sort((a, b) => {
-      const aFav = includesFavorite(a, favorites) ? 1 : 0;
-      const bFav = includesFavorite(b, favorites) ? 1 : 0;
-      return bFav - aFav || Math.abs(a.calories - perMeal) - Math.abs(b.calories - perMeal);
-    });
-
-    const chosen = effective[0] ?? pool[0];
-    used[chosen.id] = (used[chosen.id] || 0) + 1;
-    return chosen;
-  }
-
-  const week: DayPlan[] = days.map((day) => {
-    const meals: Meal[] = [];
-    for (let i = 0; i < mealsPerDay; i++) {
-      const r = pickMeal();
-      meals.push({ name: r.name, calories: r.calories });
-    }
-    const total = Math.round(meals.reduce((s, m) => s + m.calories, 0));
-    return { day, meals, total };
-  });
-
-  return week;
 }
 
-// --------------------
-// Grocery list
-// --------------------
-export function buildGroceryList(week: DayPlan[]): string[] {
-  const map = new Map<string, number>();
+export interface PlannedMeal extends Recipe {
+  servings: number;
+}
 
-  for (const day of week) {
-    for (const meal of day.meals) {
-      const r = RECIPES.find((x) => x.name === meal.name);
-      if (!r) continue;
-      for (const ing of r.ingredients) {
-        const key = ing.trim().toLowerCase();
-        map.set(key, (map.get(key) || 0) + 1);
-      }
+export interface DayPlan {
+  day: string;
+  meals: PlannedMeal[];
+  totalCalories: number;
+}
+
+const DAY_NAMES = [
+  "Monday", "Tuesday", "Wednesday", "Thursday",
+  "Friday", "Saturday", "Sunday",
+];
+
+/* -------------------------------------------------------------
+   Split exclusions → allergens + dislikes
+------------------------------------------------------------- */
+function splitExclusions(exclusions: string[] = []) {
+  const allergenValues: AllergenKey[] = [
+    "gluten","lactose","eggs","nuts","fish","soy","sesame",
+    "corn","peanuts","shellfish","celery","sulfites","mustard",
+  ];
+
+  const allergenSet = new Set<AllergenKey>(allergenValues);
+
+  const allergens: AllergenKey[] = [];
+  const dislikes: DislikeKey[] = [];
+
+  for (const ex of exclusions) {
+    if (allergenSet.has(ex as AllergenKey)) {
+      allergens.push(ex as AllergenKey);
+    } else {
+      dislikes.push(ex as DislikeKey);
     }
   }
 
-  return Array.from(map.entries())
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([item, times]) => `${item} ×${times}`);
+  return { allergens, dislikes };
+}
+
+/* -------------------------------------------------------------
+   Smart filtering with fallback logic
+------------------------------------------------------------- */
+function filterRecipesSmart(
+  recipes: Recipe[],
+  allergens: AllergenKey[],
+  dislikes: DislikeKey[],
+  maxCookTime: number,
+  dietTags?: string[]
+): Recipe[] {
+  const allergenSet = new Set(allergens);
+  const dislikeSet = new Set(dislikes);
+
+  const strict = (r: Recipe) => {
+    if (r.cookTime > maxCookTime) return false;
+    if (r.allergens.some(a => allergenSet.has(a))) return false;
+    if (r.dislikesTags?.some(d => dislikeSet.has(d))) return false;
+
+    if (dietTags && dietTags.length && !dietTags.includes("none")) {
+      if (!r.dietTags.some(tag => dietTags.includes(tag))) return false;
+    }
+
+    return true;
+  };
+
+  // 1) Strict
+  let pool = recipes.filter(strict);
+  if (pool.length > 0) return pool;
+
+  // 2) Ignore dislikes
+  pool = recipes.filter(
+    r => r.cookTime <= maxCookTime && !r.allergens.some(a => allergenSet.has(a))
+  );
+  if (pool.length > 0) return pool;
+
+  // 3) Ignore time + diet, keep allergens only
+  pool = recipes.filter(r => !r.allergens.some(a => allergenSet.has(a)));
+  if (pool.length > 0) return pool;
+
+  // 4) Last fallback → everything
+  return recipes;
+}
+
+/* -------------------------------------------------------------
+   Meal slots
+------------------------------------------------------------- */
+function mealTypeForSlot(slot: number, slots: number): MealType {
+  if (slots === 3)
+    return ["breakfast", "lunch", "dinner"][slot] as MealType;
+
+  if (slots === 4)
+    return ["breakfast", "lunch", "snack", "dinner"][slot] as MealType;
+
+  return ["breakfast", "snack", "lunch", "snack", "dinner"][slot] as MealType;
+}
+
+/* -------------------------------------------------------------
+   Calorie distribution
+------------------------------------------------------------- */
+function caloriesForSlot(slot: number, slots: number, total: number) {
+  if (slots === 3) {
+    const r = [0.25, 0.4, 0.35];
+    return Math.round(total * r[slot]);
+  }
+  if (slots === 4) {
+    const r = [0.25, 0.35, 0.15, 0.25];
+    return Math.round(total * r[slot]);
+  }
+  const r = [0.23, 0.12, 0.33, 0.12, 0.2];
+  return Math.round(total * r[slot]);
+}
+
+/* -------------------------------------------------------------
+   Smart scoring for recipe selection
+------------------------------------------------------------- */
+function pickSmartRecipe(
+  candidates: Recipe[],
+  targetCalories: number,
+  priority: "protein" | "calories",
+  recentIds: Set<string>
+): Recipe | null {
+  const usable = candidates.filter(r => !recentIds.has(r.id));
+  if (usable.length === 0) return null;
+
+  const scored = usable.map(r => {
+    const calDiff = Math.abs(r.calories - targetCalories) + 1;
+    const calScore = 1 / calDiff;
+
+    const proteinNorm = r.protein / 40;
+
+    let score =
+      priority === "protein"
+        ? calScore * 0.5 + proteinNorm * 0.5
+        : calScore * 0.75 + proteinNorm * 0.25;
+
+    score *= 0.85 + Math.random() * 0.3;
+
+    return { recipe: r, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+
+  return scored[0]?.recipe ?? null;
+}
+
+/* -------------------------------------------------------------
+   MAIN — Build Week Plan
+------------------------------------------------------------- */
+export function buildWeekPlan(input: BuildWeekPlanInput): DayPlan[] {
+  const { targetCalories, mealsPerDay, timeToCook, exclusions = [], dietTags } =
+    input;
+
+  const { allergens, dislikes } = splitExclusions(exclusions);
+
+  const basePool = filterRecipesSmart(
+    RECIPES,
+    allergens,
+    dislikes,
+    timeToCook,
+    dietTags as string[]
+  );
+
+  const slots = Math.min(Math.max(mealsPerDay, 3), 5);
+
+  const days: DayPlan[] = [];
+  const recentByType = new Map<MealType, string[]>();
+
+  for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+    const dayName = DAY_NAMES[dayIndex];
+    const meals: PlannedMeal[] = [];
+    let totalCalories = 0;
+
+    for (let slot = 0; slot < slots; slot++) {
+      const type = mealTypeForSlot(slot, slots);
+      const slotCalories = caloriesForSlot(slot, slots, targetCalories);
+
+      const priority = type === "lunch" ? "protein" : "calories";
+
+      const candidates = basePool.filter(r => r.mealType === type);
+
+      const recentIds = new Set(recentByType.get(type) ?? []);
+
+      const recipe: Recipe | null =
+        pickSmartRecipe(candidates, slotCalories, priority, recentIds) ??
+        pickSmartRecipe(basePool, slotCalories, priority, recentIds);
+
+      if (!recipe) continue;
+
+      const rawServings = slotCalories / recipe.calories;
+      const servings = Math.max(0.75, Math.min(1.5, rawServings));
+
+      meals.push({ ...recipe, servings });
+      totalCalories += recipe.calories * servings;
+
+      const updatedRecent = [...(recentByType.get(type) ?? []), recipe.id].slice(
+        -3
+      );
+      recentByType.set(type, updatedRecent);
+    }
+
+    days.push({
+      day: dayName,
+      meals,
+      totalCalories: Math.round(totalCalories),
+    });
+  }
+
+  return days;
 }

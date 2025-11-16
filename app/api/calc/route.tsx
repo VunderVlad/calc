@@ -1,12 +1,19 @@
 // app/api/calc/route.ts
 import * as React from "react";
 import { NextResponse } from "next/server";
-import { z, type ZodObject, type ZodRawShape } from "zod";
+
 
 import { calculateAll, type CalcInput } from "@/lib/calc";
 import { buildWeekPlan } from "@/lib/meal";
 import PlanEmail from "@/emails/PlanEmail";
 import { Resend } from "resend";
+
+// Import THE REAL schema (only this one!)
+import {
+  payloadSchema,
+  type StudentPayload,
+  type TrainerPayload,
+} from "./schema";
 
 /* -------------------------------------------------------
    Email setup
@@ -18,54 +25,6 @@ const resend =
 
 const SEND_EMAIL =
   (process.env.SEND_EMAIL ?? "false").toLowerCase() === "true";
-
-/* -------------------------------------------------------
-   Validation Schemas
-------------------------------------------------------- */
-import {
-  payloadSchema,
-  StudentPayload,
-  TrainerPayload,
-} from "./schema";
-
-
-const baseDiet = z.object({
-  mealsPerDay: z.number().int().min(3).max(5),
-  timeToCook: z.number().int().min(10).max(90).default(30),
-  dietType: z.enum(["none", "vegetarian", "vegan", "keto"]).default("none"),
-  exclusions: z.array(z.string()).default([]),
-  cuisineLikes: z.array(z.string()).default([]),
-  favoriteIngredients: z.array(z.string()).default([]),
-  allergens: z.array(z.string()).default([]),
-  dislikes: z.array(z.string()).default([]),
-  name: z.string().optional(),
-  email: z.string().email().optional(),
-  consent: z.boolean().default(false),
-  lang: z.enum(["en", "sk", "ua"]).default("en"),
-}) satisfies ZodObject<ZodRawShape>;
-
-const studentPayload = baseDiet.extend({
-  mode: z.literal("student"),
-  sex: z.enum(["male", "female"]),
-  age: z.number().int().min(12).max(100),
-  heightCm: z.number().min(120).max(230),
-  weightKg: z.number().min(35).max(300),
-  activity: z.enum(["sedentary", "light", "moderate", "very", "athlete"]),
-  goal: z.enum(["lose", "maintain", "gain"]),
-});
-
-const trainerPayload = baseDiet.extend({
-  mode: z.literal("trainer"),
-  targetCalories: z.number().min(1200).max(5000),
-  proteinG: z.number().min(0).max(400).optional(),
-  fatG: z.number().min(0).max(200).optional(),
-  proteinPerKg: z.number().min(0).max(3).optional(),
-  fatPerKg: z.number().min(0).max(1.5).optional(),
-  weightKg: z.number().min(35).max(300).optional(),
-});
-
-
-
 
 /* -------------------------------------------------------
    Types
@@ -125,7 +84,7 @@ export async function POST(req: Request) {
     }
 
     const body = parsed.data;
-    let calc: CalcOut;
+    let calc: CalcOut | null = null;
 
     /* ---------- Student ---------- */
     if (body.mode === "student") {
@@ -183,6 +142,10 @@ export async function POST(req: Request) {
       };
     }
 
+    if (!calc) {
+      throw new Error("Failed to calculate plan");
+    }
+
     /* ---------- Meal plan ---------- */
     const dietTags =
       body.dietType && body.dietType !== "none"
@@ -196,25 +159,14 @@ export async function POST(req: Request) {
       favorites: body.favoriteIngredients,
       dietTags,
       exclusions: [...body.exclusions, ...body.allergens, ...body.dislikes],
-      cuisineLikes: body.cuisineLikes,
     });
 
     let grocery: string[] = [];
 
     if (Array.isArray(weekPlan)) {
-      // weekPlan is an array of days
       grocery = buildGroceryFromWeek(weekPlan as Day[]);
-    } else if (weekPlan && typeof weekPlan === "object") {
-      // weekPlan is an object that may contain a grocery array
-      const maybeGrocery = (weekPlan as { grocery?: unknown }).grocery;
-
-      if (
-        Array.isArray(maybeGrocery) &&
-        maybeGrocery.every((x): x is string => typeof x === "string")
-      ) {
-        grocery = maybeGrocery;
-      }
     }
+
     /* ---------- Optional Email ---------- */
     let emailId: string | null = null;
 
