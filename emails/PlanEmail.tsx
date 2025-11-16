@@ -1,9 +1,20 @@
+// calcba1/emails/PlanEmail.tsx
 import * as React from "react";
 import en from "@/locales/en";
 import sk from "@/locales/sk";
 import ua from "@/locales/ua";
 
 export type Lang = "en" | "sk" | "ua";
+
+export interface DayMeal {
+  name: string;
+  ingredients?: { name: string; amount: number }[];
+}
+
+export interface WeekDay {
+  day?: string;
+  meals?: DayMeal[];
+}
 
 export type PlanEmailProps = {
   lang?: Lang;
@@ -13,7 +24,7 @@ export type PlanEmailProps = {
     fatG: number;
     carbsG: number;
   };
-  weekPlan?: any[];
+  weekPlan?: WeekDay[];   // ✅ FIXED — NO "any"
   grocery?: string[];
 };
 
@@ -69,10 +80,10 @@ export default function PlanEmail({
               </td>
             </tr>
           </thead>
+
           <tbody>
             <tr>
               <td style={{ padding: "24px 32px" }}>
-                {/* Title */}
                 <p
                   style={{
                     fontSize: 18,
@@ -83,7 +94,7 @@ export default function PlanEmail({
                   {brand}
                 </p>
 
-                {/* Daily targets */}
+                {/* Daily Targets */}
                 <h3
                   style={{
                     fontSize: 18,
@@ -94,6 +105,7 @@ export default function PlanEmail({
                 >
                   {t.dailyTargets}
                 </h3>
+
                 <ul style={{ fontSize: 15, lineHeight: 1.6, margin: 0 }}>
                   <li>
                     Calories: <strong>{calc.targetCalories} kcal</strong>
@@ -109,7 +121,7 @@ export default function PlanEmail({
                   </li>
                 </ul>
 
-                {/* Meal Plan */}
+                {/* WEEK PLAN */}
                 {weekPlan.length > 0 && (
                   <>
                     <h3
@@ -122,6 +134,7 @@ export default function PlanEmail({
                     >
                       {t.mealPlan}
                     </h3>
+
                     <table
                       style={{
                         width: "100%",
@@ -130,7 +143,7 @@ export default function PlanEmail({
                       }}
                     >
                       <tbody>
-                        {weekPlan.map((day: any, idx: number) => (
+                        {weekPlan.map((day: WeekDay, idx: number) => (
                           <tr key={idx}>
                             <td
                               style={{
@@ -141,7 +154,9 @@ export default function PlanEmail({
                             >
                               <strong>{day.day || `Day ${idx + 1}`}</strong>:{" "}
                               {Array.isArray(day.meals)
-                                ? day.meals.map((m: any) => m.name).join(", ")
+                                ? day.meals
+                                    .map((m: DayMeal) => m?.name ?? "")
+                                    .join(", ")
                                 : ""}
                             </td>
                           </tr>
@@ -151,7 +166,7 @@ export default function PlanEmail({
                   </>
                 )}
 
-                {/* Grocery List */}
+                {/* GROCERY LIST */}
                 {grocery.length > 0 && (
                   <>
                     <h3
@@ -164,6 +179,7 @@ export default function PlanEmail({
                     >
                       {t.grocery}
                     </h3>
+
                     <ul
                       style={{
                         fontSize: 14,
@@ -172,14 +188,14 @@ export default function PlanEmail({
                         paddingLeft: 16,
                       }}
                     >
-                      {grocery.map((g, i) => (
-                        <li key={i}>{g}</li>
+                      {grocery.map((item, i) => (
+                        <li key={i}>{item}</li>
                       ))}
                     </ul>
                   </>
                 )}
 
-                {/* Training Plan (optional) */}
+                {/* TRAINING */}
                 <h3
                   style={{
                     fontSize: 18,
@@ -194,7 +210,6 @@ export default function PlanEmail({
                   Coming soon — personalized workouts for your plan.
                 </p>
 
-                {/* Footer */}
                 <p
                   style={{
                     fontSize: 13,

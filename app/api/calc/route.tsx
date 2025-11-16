@@ -22,6 +22,13 @@ const SEND_EMAIL =
 /* -------------------------------------------------------
    Validation Schemas
 ------------------------------------------------------- */
+import {
+  payloadSchema,
+  StudentPayload,
+  TrainerPayload,
+} from "./schema";
+
+
 const baseDiet = z.object({
   mealsPerDay: z.number().int().min(3).max(5),
   timeToCook: z.number().int().min(10).max(90).default(30),
@@ -57,14 +64,8 @@ const trainerPayload = baseDiet.extend({
   weightKg: z.number().min(35).max(300).optional(),
 });
 
-export const payloadSchema = z.discriminatedUnion("mode", [
-  studentPayload,
-  trainerPayload,
-]);
 
-export type Payload = z.infer<typeof payloadSchema>;
-export type StudentPayload = z.infer<typeof studentPayload>;
-export type TrainerPayload = z.infer<typeof trainerPayload>;
+
 
 /* -------------------------------------------------------
    Types

@@ -1,17 +1,36 @@
+// calcba1/app/api/test-email/route.ts
 import { NextResponse } from "next/server";
-import PlanEmail from "@/emails/PlanEmail";
+import { render } from "@react-email/render";
+import * as React from "react";
+
+import PlanEmail from "../../../emails/PlanEmail";
+import type { CalcResult } from "@/lib/calc";
 
 export async function GET() {
-  const html = PlanEmail({
-    lang: "ua", // ✅ use "ua"
-    calc: { targetCalories: 2500, proteinG: 160, fatG: 70, carbsG: 320 },
-    weekPlan: [
-      { day: "Monday", meals: [{ name: "Oatmeal" }, { name: "Chicken & Rice" }] },
-    ],
-    grocery: ["Oats — 500g", "Chicken breast — 2kg", "Rice — 1kg"],
-  });
+  const calc: CalcResult = {
+    bmr: 1500,
+    tdee: 2000,
+    targetCalories: 1800,
+    proteinG: 120,
+    fatG: 60,
+    carbsG: 180,
+  };
 
-  return new NextResponse(html as any, {
+  // Typed without any
+  const weekPlan: Array<Record<string, unknown>> = [];
+  const grocery: string[] = [];
+
+  // Render email to string
+  const emailHtml: string = await render(
+    React.createElement(PlanEmail, {
+      calc,
+      weekPlan,
+      grocery,
+      lang: "en",
+    })
+  );
+
+  return new NextResponse(emailHtml, {
     headers: { "Content-Type": "text/html" },
   });
 }
