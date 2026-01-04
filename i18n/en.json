@@ -1,0 +1,708 @@
+{
+  "home": {
+    "title": "Choose Calculator Mode",
+    "subtitle": "Select what you want to calculate.",
+    "user": {
+      "title": "User calculator",
+      "description": "Automatic macro calculation + weekly meal plan."
+    },
+    "trainer": {
+      "title": "Trainer calculator",
+      "description": "Manual macros + coach notes + weekly plan."
+    }
+  },
+  "user": {
+    "title": "User calculator",
+    "subtitle": "Enter your data to get macros, weekly plan and shopping list."
+  },
+  "trainer": {
+    "title": "Trainer calculator",
+    "subtitle": "Override calories/macros manually and add coach notes.",
+    "calories": "Calories (kcal)",
+    "protein": "Protein (g)",
+    "carbs": "Carbs (g)",
+    "fat": "Fat (g)",
+    "notes": "Coach notes",
+    "notesPlaceholder": "Special instructions, training focus, weekly goals..."
+  },
+  "form": {
+    "name": "Name",
+    "email": "Email *",
+    "age": "Age",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "activity": "Activity",
+    "goal": "Goal",
+    "goalLose": "Lose weight",
+    "goalMaintain": "Maintain",
+    "goalGain": "Gain muscle",
+    "language": "Language",
+    "submit": "Get my plan",
+    "submitting": "Calculating...",
+    "activitySedentary": "Sedentary",
+    "activityLight": "Light",
+    "activityModerate": "Moderate",
+    "activityHigh": "High",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorSend": "Could not send plan. Please try again.",
+    "errorNetwork": "Network error. Please try again.",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "you@example.com",
+    "emailHelper": "We'll send your meal plan to this email address",
+    "ageHelper": "Your age in years",
+    "heightHelper": "Your height in centimeters",
+    "weightHelper": "Your current weight in kilograms",
+    "genderHelper": "Select your gender",
+    "activityHelper": "How active are you? Sedentary = little/no exercise, Light = light exercise 1-3 days/week, Moderate = moderate exercise 3-5 days/week, High = hard exercise 6-7 days/week",
+    "goalHelper": "What is your main goal?",
+    "caloriesHelper": "Daily calorie target in kcal",
+    "proteinHelper": "Daily protein target in grams",
+    "carbsHelper": "Daily carbs target in grams",
+    "fatHelper": "Daily fat target in grams",
+    "coachNotesHelper": "Add any special instructions, training focus, or weekly goals for the client"
+  },
+  "filters": {
+    "allergensTitle": "Allergens (avoid)",
+    "dislikesTitle": "Disliked foods (avoid)",
+    "tip": "Tip: If you select too many filters, we may not have enough meals to build a full week.",
+    "allergens": {
+      "dairy": "Dairy",
+      "eggs": "Eggs",
+      "gluten": "Gluten",
+      "nuts": "Tree nuts",
+      "peanuts": "Peanuts",
+      "soy": "Soy",
+      "fish": "Fish",
+      "shellfish": "Shellfish",
+      "sesame": "Sesame",
+      "mustard": "Mustard",
+      "celery": "Celery",
+      "sulfites": "Sulfites",
+      "lupin": "Lupin"
+    },
+    "dislikes": {
+      "mushrooms": "Mushrooms",
+      "onions": "Onions",
+      "garlic": "Garlic",
+      "broccoli": "Broccoli",
+      "cauliflower": "Cauliflower",
+      "spinach": "Spinach",
+      "zucchini": "Zucchini",
+      "tomatoes": "Tomatoes",
+      "bellPepper": "Bell pepper",
+      "lentils": "Lentils",
+      "chickpeas": "Chickpeas",
+      "beans": "Beans",
+      "tofu": "Tofu",
+      "soy": "Soy",
+      "fish": "Fish",
+      "shellfish": "Shellfish",
+      "pork": "Pork",
+      "beef": "Beef",
+      "chicken": "Chicken",
+      "eggs": "Eggs",
+      "milk": "Milk",
+      "cheese": "Cheese",
+      "yogurt": "Yogurt",
+      "cottageCheese": "Cottage cheese",
+      "oats": "Oats",
+      "rice": "Rice",
+      "pasta": "Pasta",
+      "nuts": "Tree nuts",
+      "peanuts": "Peanuts"
+    }
+  },
+  "email": {
+    "userTitle": "Your DonetsFit Nutrition Plan{forName}",
+    "trainerTitle": "Trainer Nutrition Plan{forName}",
+    "userSubject": "Your DonetsFit plan",
+    "trainerSubject": "Your DonetsFit trainer plan",
+    "thanks": "Thank you for using DonetsFit 💚 Below is your complete personalized nutrition plan.",
+    "trainerIntro": "This plan was created in Trainer Mode 💚 Macros were set manually and meals were generated automatically.",
+    "preferencesTitle": "Your preferences",
+    "allergensAvoided": "Allergens avoided",
+    "dislikesAvoided": "Disliked products avoided",
+    "dislikedProducts": "Disliked products",
+    "targetsTitle": "Daily Nutrition Targets",
+    "weeklyPlanTitle": "Weekly Meal Plan",
+    "shoppingTitle": "Weekly Shopping List",
+    "ingredients": "Ingredients",
+    "howToCook": "How to cook",
+    "protein": "protein",
+    "carbs": "carbs",
+    "fat": "fat",
+    "calories": "Calories",
+    "coachNotesTitle": "Coach Notes",
+    "tipsTitle": "Tips",
+    "tip1": "Drink enough water during the day",
+    "tip2": "Try to eat meals at similar times",
+    "tip3": "Adjust portions if needed",
+    "tip4": "Consistency is more important than perfection",
+    "bestWishes": "Best wishes",
+    "bestRegards": "Best regards",
+    "team": "DonetsFit Team 💚",
+    "trainerSign": "DonetsFit Trainer 💚",
+    "day": "Day",
+    "weekTitle": "Weekly Meal Plan",
+    "footer": "Best wishes, DonetsFit Team 💚",
+    "pdfAttached": "A detailed PDF version of your nutrition plan is attached to this email."
+  },
+  "pdf": {
+    "nutritionPlan": "Nutrition Plan",
+    "for": "For",
+    "language": "Language",
+    "dailyTargets": "Daily Targets",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack",
+    "weeklyTips": "Weekly Tips"
+  },
+  "ingredient": {
+    "oats": "Oats",
+    "wheyProtein": "Whey protein",
+    "milk": "Milk",
+    "salmon": "Salmon",
+    "potatoes": "Potatoes",
+    "oliveOil": "Olive oil",
+    "chickenBreast": "Chicken breast",
+    "rice": "Rice",
+    "banana": "Banana",
+    "turkey": "Turkey",
+    "tortilla": "Tortilla",
+    "lettuce": "Lettuce",
+    "pasta": "Pasta",
+    "tomatoes": "Tomatoes",
+    "bread": "Bread",
+    "peanutButter": "Peanut butter",
+    "eggs": "Eggs",
+    "butter": "Butter",
+    "greekYogurt": "Greek yogurt",
+    "berries": "Berries",
+    "honey": "Honey",
+    "tuna": "Tuna",
+    "mayo": "Mayonnaise",
+    "cucumber": "Cucumber",
+    "beef": "Beef",
+    "bellPepper": "Bell pepper",
+    "soySauce": "Soy sauce",
+    "cottageCheese": "Cottage cheese",
+    "apple": "Apple",
+    "cinnamon": "Cinnamon",
+    "walnuts": "Walnuts",
+    "lemon": "Lemon",
+    "riceCakes": "Rice cakes",
+    "avocado": "Avocado",
+    "salt": "Salt",
+    "parmesan": "Parmesan cheese",
+    "garlic": "Garlic",
+    "carrot": "Carrot",
+    "onion": "Onion",
+    "spinach": "Spinach",
+    "cheese": "Cheese",
+    "broccoli": "Broccoli",
+    "shrimp": "Shrimp",
+    "caesarSauce": "Caesar sauce",
+    "porkLoin": "Pork loin",
+    "sweetPotato": "Sweet potato",
+    "chickpeas": "Chickpeas",
+    "zucchini": "Zucchini",
+    "groundBeef": "Ground beef",
+    "chiaSeeds": "Chia seeds",
+    "corn": "Corn",
+    "tofu": "Tofu",
+    "carrots": "Carrots",
+    "lentils": "Lentils",
+    "beans": "Beans",
+    "granola": "Granola",
+    "yogurt": "Yogurt",
+    "greekYogurt2": "Greek yogurt 2%",
+    "quinoa": "Quinoa",
+    "bulgur": "Bulgur",
+    "orzo": "Orzo",
+    "noodles": "Noodles",
+    "eggWhites": "Egg whites",
+    "greenBeans": "Green beans",
+    "pear": "Pear",
+    "almonds": "Almonds",
+    "mushrooms": "Mushrooms",
+    "strawberries": "Strawberries",
+    "cocoaPowder": "Cocoa powder"
+  },
+  "step": {
+    "cookOats": "Cook oats according to package instructions",
+    "addProtein": "Add protein powder and mix well",
+    "mixAndServe": "Mix everything together and serve",
+    "bakeSalmon": "Bake salmon in the oven at 180°C for 15-20 minutes",
+    "boilPotatoes": "Boil potatoes until tender, about 20 minutes",
+    "plateAndServe": "Plate everything and serve hot",
+    "cookChicken": "Cook chicken breast in a pan until golden and cooked through",
+    "cookRice": "Cook rice according to package instructions",
+    "combineAndServe": "Combine all ingredients and serve",
+    "boilOats": "Boil oats in water or milk until creamy",
+    "sliceBanana": "Slice banana and add to the bowl",
+    "prepareIngredients": "Prepare all ingredients and set aside",
+    "wrapAndServe": "Wrap ingredients in tortilla and serve",
+    "boilPasta": "Boil pasta in salted water until al dente",
+    "prepareSauce": "Prepare tomato sauce with olive oil and seasonings",
+    "toastBread": "Toast bread until golden brown",
+    "spreadPeanutButter": "Spread peanut butter on toast",
+    "whiskEggs": "Whisk eggs in a bowl",
+    "cookScramble": "Cook scrambled eggs in a pan with butter",
+    "addYogurtToBowl": "Add Greek yogurt to a bowl",
+    "addBerries": "Add fresh berries on top",
+    "drizzleHoney": "Drizzle honey over the yogurt",
+    "mixTunaWithSauce": "Mix tuna with mayonnaise",
+    "assembleSandwich": "Assemble sandwich with bread, tuna, and vegetables",
+    "sliceAndServe": "Slice sandwich and serve",
+    "stirFryMeat": "Stir-fry beef in a hot pan",
+    "addVegetablesAndSauce": "Add bell peppers and soy sauce, cook until tender",
+    "sliceApple": "Slice apple into thin pieces",
+    "addCottageCheeseToBowl": "Add cottage cheese to a bowl",
+    "topWithAppleAndCinnamon": "Top with apple slices and cinnamon",
+    "bakePotatoes": "Bake potatoes in the oven at 200°C for 40-50 minutes",
+    "cookSalmon": "Cook salmon in a pan or oven until flaky",
+    "finishWithLemon": "Finish with a squeeze of lemon juice",
+    "mashAvocado": "Mash avocado with a fork",
+    "spreadOnRiceCakes": "Spread mashed avocado on rice cakes",
+    "seasonAndServe": "Season with salt and serve",
+    "makeCreamySauce": "Make creamy sauce with Greek yogurt and parmesan",
+    "sauteVegetables": "Sauté vegetables in olive oil until soft",
+    "addLentilsAndWater": "Add lentils and water, bring to a boil",
+    "simmerUntilSoft": "Simmer until lentils are soft, about 30 minutes",
+    "serveHot": "Serve hot",
+    "warmTortilla": "Warm tortilla in a pan or microwave",
+    "blendBatter": "Blend all ingredients until smooth",
+    "fryPancakes": "Fry pancakes in a pan until golden on both sides",
+    "serveWithToppings": "Serve with your favorite toppings",
+    "cookTurkey": "Cook turkey in a pan until fully cooked",
+    "steamVegetables": "Steam broccoli until tender",
+    "addPeanutButter": "Add peanut butter and mix well",
+    "sauteGarlic": "Sauté garlic in olive oil until fragrant",
+    "cookShrimp": "Cook shrimp until pink and opaque",
+    "chopLettuce": "Chop lettuce into bite-sized pieces",
+    "addSauceAndCheese": "Add Caesar sauce and parmesan cheese",
+    "tossAndServe": "Toss salad and serve",
+    "addIngredientsToBlender": "Add all ingredients to a blender",
+    "blendUntilSmooth": "Blend until smooth and creamy",
+    "pourAndServe": "Pour into a glass and serve immediately",
+    "bakeSweetPotato": "Bake sweet potato in the oven at 200°C for 45-60 minutes",
+    "cookPork": "Cook pork loin in a pan until golden and cooked through",
+    "cookVegetables": "Cook vegetables in a pan until tender",
+    "cookOmelette": "Cook omelette in a pan until set",
+    "cookChickpeas": "Cook chickpeas until tender",
+    "roastVegetables": "Roast vegetables in the oven until caramelized",
+    "formBurgerPatty": "Form ground beef into a burger patty",
+    "cookBurger": "Cook burger patty in a pan until done",
+    "assembleAndServe": "Assemble burger and serve",
+    "mixIngredients": "Mix all ingredients together",
+    "chillOvernight": "Chill in the refrigerator overnight",
+    "serveCold": "Serve cold",
+    "sliceFruit": "Slice fruit into pieces",
+    "combineIngredients": "Combine all ingredients in a bowl",
+    "serveImmediately": "Serve immediately",
+    "prepareWrap": "Prepare wrap with all ingredients",
+    "boilLentils": "Boil lentils until tender",
+    "addVegetables": "Add vegetables and continue cooking",
+    "simmerAndServe": "Simmer until everything is cooked and serve",
+    "mixBatter": "Mix batter ingredients until smooth",
+    "cookPancakes": "Cook pancakes in a pan",
+    "serveWarm": "Serve warm",
+    "drainTuna": "Drain tuna from can",
+    "tossAndServe": "Toss salad ingredients and serve",
+    "stirFryBeef": "Stir-fry beef until browned",
+    "cookEggs": "Cook eggs to your preference",
+    "cookTofu": "Cook tofu in a pan until golden",
+    "stirFryVegetables": "Stir-fry vegetables until tender",
+    "cookPasta": "Cook pasta until al dente",
+    "sauteShrimp": "Sauté shrimp until cooked",
+    "layerIngredients": "Layer yogurt, granola, and honey",
+    "assembleComponents": "Assemble all components",
+    "placeOnPlate": "Place neatly on a plate",
+    "sliceAvocado": "Slice avocado into pieces",
+    "topWithNuts": "Top with nuts",
+    "prepareTuna": "Prepare tuna by draining and flaking",
+    "cookQuinoa": "Cook quinoa according to package instructions",
+    "cookBulgur": "Cook bulgur according to package instructions",
+    "formBalls": "Form mixture into balls",
+    "chillAndServe": "Chill in refrigerator and serve",
+    "addBeansAndSpices": "Add beans and spices, cook until tender",
+    "serveWithRice": "Serve with cooked rice",
+    "chillBeforeServing": "Chill in refrigerator before serving",
+    "cookNoodles": "Cook noodles according to package instructions",
+    "addSpicesAndVegetables": "Add spices and vegetables, continue cooking",
+    "cookLentils": "Cook lentils until tender",
+    "addMilkAndSimmer": "Add milk and simmer until creamy",
+    "prepareBatter": "Prepare batter by mixing all ingredients",
+    "bakeUntilSet": "Bake until set and golden",
+    "cookEggWhites": "Cook egg whites in a pan until set",
+    "cookOrzo": "Cook orzo according to package instructions"
+  },
+  "meal": {
+    "oatmeal_protein_bowl_01": {
+      "name": "Protein Oatmeal Bowl",
+      "description": "High-protein breakfast with oats and whey protein"
+    },
+    "salmon_potato_plate_01": {
+      "name": "Salmon with Potatoes",
+      "description": "Balanced dinner with omega-3 rich salmon"
+    },
+    "chicken_rice_plate_01": {
+      "name": "Chicken and Rice",
+      "description": "Classic high-protein lunch"
+    },
+    "oatmeal_banana_bowl_05": {
+      "name": "Oatmeal Banana Bowl",
+      "description": "Sweet and filling breakfast"
+    },
+    "chicken_rice_bowl_06": {
+      "name": "Chicken Rice Bowl",
+      "description": "Balanced protein and carbs"
+    },
+    "turkey_wrap_07": {
+      "name": "Turkey Wrap",
+      "description": "Quick and portable lunch"
+    },
+    "pasta_tomato_sauce_08": {
+      "name": "Pasta with Tomato Sauce",
+      "description": "Comforting vegetarian dinner"
+    },
+    "peanut_butter_toast_09": {
+      "name": "Peanut Butter Toast",
+      "description": "Quick energy snack"
+    },
+    "scrambled_eggs_plate_10": {
+      "name": "Scrambled Eggs",
+      "description": "High-protein quick breakfast"
+    },
+    "greek_yogurt_berry_cup_11": {
+      "name": "Greek Yogurt with Berries",
+      "description": "High-protein snack with berries"
+    },
+    "tuna_salad_sandwich_12": {
+      "name": "Tuna Salad Sandwich",
+      "description": "Quick high-protein lunch"
+    },
+    "beef_stir_fry_rice_13": {
+      "name": "Beef Stir Fry with Rice",
+      "description": "Balanced high-protein dinner"
+    },
+    "cottage_cheese_apple_bowl_14": {
+      "name": "Cottage Cheese with Apple",
+      "description": "High-protein breakfast with fruit"
+    },
+    "salmon_potato_plate_15": {
+      "name": "Salmon with Potatoes",
+      "description": "Omega-3 rich balanced dinner"
+    },
+    "rice_cakes_avocado_16": {
+      "name": "Rice Cakes with Avocado",
+      "description": "Quick healthy snack"
+    },
+    "chicken_pasta_alfredo_light_17": {
+      "name": "Chicken Pasta Alfredo (Light)",
+      "description": "Creamy high-protein dinner"
+    },
+    "lentil_soup_bowl_18": {
+      "name": "Lentil Soup",
+      "description": "Hearty vegetarian lunch"
+    },
+    "egg_cheese_breakfast_wrap_19": {
+      "name": "Egg and Cheese Breakfast Wrap",
+      "description": "High-protein portable breakfast"
+    },
+    "protein_pancakes_20": {
+      "name": "Protein Pancakes",
+      "description": "Sweet high-protein breakfast"
+    },
+    "turkey_rice_bowl_21": {
+      "name": "Turkey Rice Bowl",
+      "description": "Balanced high-protein lunch"
+    },
+    "oatmeal_banana_peanut_22": {
+      "name": "Oatmeal with Banana and Peanut Butter",
+      "description": "Energy-rich breakfast"
+    },
+    "shrimp_pasta_garlic_23": {
+      "name": "Shrimp Pasta with Garlic",
+      "description": "Quick seafood dinner"
+    },
+    "chicken_caesar_salad_light_24": {
+      "name": "Chicken Caesar Salad (Light)",
+      "description": "Low-carb high-protein lunch"
+    },
+    "protein_berry_smoothie_25": {
+      "name": "Protein Berry Smoothie",
+      "description": "High-protein drink snack"
+    },
+    "pork_loin_sweet_potato_26": {
+      "name": "Pork Loin with Sweet Potato",
+      "description": "Balanced dinner"
+    },
+    "veggie_omelette_27": {
+      "name": "Vegetable Omelette",
+      "description": "Quick vegetarian breakfast"
+    },
+    "chickpea_veggie_bowl_28": {
+      "name": "Chickpea Vegetable Bowl",
+      "description": "Fiber-rich vegan lunch"
+    },
+    "beef_burger_plate_29": {
+      "name": "Beef Burger",
+      "description": "Comforting high-protein dinner"
+    },
+    "yogurt_chia_pudding_30": {
+      "name": "Yogurt Chia Pudding",
+      "description": "Sweet meal-prep snack"
+    },
+    "salmon_rice_plate_31": {
+      "name": "Salmon with Rice",
+      "description": "Omega-3 balanced dinner"
+    },
+    "cottage_cheese_fruit_bowl_32": {
+      "name": "Cottage Cheese Fruit Bowl",
+      "description": "High-protein sweet snack"
+    },
+    "chicken_wrap_whole_wheat_33": {
+      "name": "Chicken Wrap (Whole Wheat)",
+      "description": "Portable balanced lunch"
+    },
+    "lentil_vegetable_soup_34": {
+      "name": "Lentil Vegetable Soup",
+      "description": "Fiber-rich vegan dinner"
+    },
+    "protein_pancakes_35": {
+      "name": "Protein Pancakes",
+      "description": "Sweet high-protein breakfast"
+    },
+    "tuna_corn_salad_36": {
+      "name": "Tuna Corn Salad",
+      "description": "Quick high-protein lunch"
+    },
+    "beef_stir_fry_rice_37": {
+      "name": "Beef Stir Fry with Rice",
+      "description": "High-protein dinner"
+    },
+    "avocado_egg_toast_38": {
+      "name": "Avocado Egg Toast",
+      "description": "Quick healthy breakfast"
+    },
+    "tofu_veggie_stir_fry_39": {
+      "name": "Tofu Vegetable Stir Fry",
+      "description": "Plant-protein vegan dinner"
+    },
+    "banana_yogurt_smoothie_40": {
+      "name": "Banana Yogurt Smoothie",
+      "description": "Quick drink snack"
+    },
+    "turkey_rice_bowl_41": {
+      "name": "Turkey Rice Bowl",
+      "description": "Balanced high-protein lunch"
+    },
+    "oatmeal_apple_cinnamon_42": {
+      "name": "Oatmeal with Apple and Cinnamon",
+      "description": "Fiber-rich sweet breakfast"
+    },
+    "shrimp_pasta_plate_43": {
+      "name": "Shrimp Pasta",
+      "description": "Balanced seafood dinner"
+    },
+    "yogurt_granola_cup_44": {
+      "name": "Yogurt Granola Cup",
+      "description": "Quick sweet snack"
+    },
+    "chicken_potato_plate_45": {
+      "name": "Chicken with Potatoes",
+      "description": "Classic balanced dinner"
+    },
+    "smoothie_berry_protein_46": {
+      "name": "Berry Protein Smoothie",
+      "description": "High-protein drink snack"
+    },
+    "veggie_rice_stir_fry_47": {
+      "name": "Vegetable Rice Stir Fry",
+      "description": "Fiber-rich vegan lunch"
+    },
+    "eggs_spinach_toast_48": {
+      "name": "Eggs with Spinach on Toast",
+      "description": "Quick high-protein breakfast"
+    },
+    "beef_bean_chili_49": {
+      "name": "Beef Bean Chili",
+      "description": "Hearty high-protein dinner"
+    },
+    "apple_peanut_butter_snack_50": {
+      "name": "Apple with Peanut Butter",
+      "description": "Quick energy snack"
+    },
+    "egg_avocado_bowl_51": {
+      "name": "Egg and Avocado Bowl",
+      "description": "Quick breakfast with healthy fats"
+    },
+    "oatmeal_berry_almond_52": {
+      "name": "Oatmeal with Berries and Almonds",
+      "description": "Fiber-rich vegetarian breakfast"
+    },
+    "chicken_quinoa_bowl_53": {
+      "name": "Chicken Quinoa Bowl",
+      "description": "High-protein balanced lunch"
+    },
+    "tuna_rice_bowl_54": {
+      "name": "Tuna Rice Bowl",
+      "description": "Quick high-protein lunch"
+    },
+    "beef_potato_plate_55": {
+      "name": "Beef with Potatoes",
+      "description": "Classic high-protein dinner"
+    },
+    "protein_chia_pudding_56": {
+      "name": "Protein Chia Pudding",
+      "description": "High-protein meal-prep snack"
+    },
+    "turkey_pasta_plate_57": {
+      "name": "Turkey Pasta",
+      "description": "High-protein dinner"
+    },
+    "veggie_omelette_plate_58": {
+      "name": "Vegetable Omelette",
+      "description": "Quick vegetarian breakfast"
+    },
+    "salmon_quinoa_plate_59": {
+      "name": "Salmon with Quinoa",
+      "description": "Omega-3 rich balanced dinner"
+    },
+    "banana_peanut_smoothie_60": {
+      "name": "Banana Peanut Smoothie",
+      "description": "Energy-boosting drink snack"
+    },
+    "oatmeal_pear_walnut_61": {
+      "name": "Oatmeal with Pear and Walnuts",
+      "description": "Fiber-rich vegetarian breakfast"
+    },
+    "egg_mushroom_scramble_62": {
+      "name": "Egg and Mushroom Scramble",
+      "description": "Quick high-protein breakfast"
+    },
+    "chicken_bulgur_bowl_63": {
+      "name": "Chicken Bulgur Bowl",
+      "description": "Balanced high-protein lunch"
+    },
+    "tuna_pasta_salad_64": {
+      "name": "Tuna Pasta Salad",
+      "description": "Quick high-protein lunch"
+    },
+    "beef_rice_pepper_65": {
+      "name": "Beef with Rice and Peppers",
+      "description": "Classic high-protein dinner"
+    },
+    "yogurt_fruit_nut_cup_66": {
+      "name": "Yogurt Fruit and Nut Cup",
+      "description": "Quick sweet snack"
+    },
+    "turkey_potato_plate_67": {
+      "name": "Turkey with Potatoes",
+      "description": "Balanced dinner"
+    },
+    "protein_oat_balls_68": {
+      "name": "Protein Oat Balls",
+      "description": "High-protein meal-prep snack"
+    },
+    "salmon_veggie_stir_fry_69": {
+      "name": "Salmon Vegetable Stir Fry",
+      "description": "Omega-3 rich dinner"
+    },
+    "banana_cottage_cheese_70": {
+      "name": "Banana with Cottage Cheese",
+      "description": "High-protein sweet snack"
+    },
+    "oatmeal_pear_walnut_81": {
+      "name": "Oatmeal with Pear and Walnuts",
+      "description": "Fiber-rich vegetarian breakfast"
+    },
+    "egg_white_veggie_scramble_82": {
+      "name": "Egg White Vegetable Scramble",
+      "description": "High-protein low-fat breakfast"
+    },
+    "chicken_bulgur_bowl_83": {
+      "name": "Chicken Bulgur Bowl",
+      "description": "Balanced high-protein lunch"
+    },
+    "turkey_chili_rice_84": {
+      "name": "Turkey Chili with Rice",
+      "description": "Hearty high-protein dinner"
+    },
+    "protein_pudding_cocoa_85": {
+      "name": "Chocolate Protein Pudding",
+      "description": "Sweet high-protein snack"
+    },
+    "beef_noodle_stir_fry_86": {
+      "name": "Beef Noodle Stir Fry",
+      "description": "Comforting high-protein dinner"
+    },
+    "cottage_cheese_honey_nuts_87": {
+      "name": "Cottage Cheese with Honey and Nuts",
+      "description": "Sweet high-protein snack"
+    },
+    "salmon_orzo_plate_88": {
+      "name": "Salmon with Orzo",
+      "description": "Omega-3 rich balanced dinner"
+    },
+    "apple_yogurt_cinnamon_89": {
+      "name": "Apple Yogurt with Cinnamon",
+      "description": "Quick light snack"
+    },
+    "veggie_lentil_curry_90": {
+      "name": "Vegetable Lentil Curry",
+      "description": "Fiber-rich vegan dinner"
+    },
+    "oatmeal_chocolate_peanut_91": {
+      "name": "Chocolate Peanut Oatmeal",
+      "description": "Sweet energy breakfast"
+    },
+    "chicken_wrap_avocado_92": {
+      "name": "Chicken Avocado Wrap",
+      "description": "Balanced portable lunch"
+    },
+    "shrimp_rice_bowl_93": {
+      "name": "Shrimp Rice Bowl",
+      "description": "Balanced seafood dinner"
+    },
+    "protein_banana_pancakes_94": {
+      "name": "Protein Banana Pancakes",
+      "description": "Sweet high-protein breakfast"
+    },
+    "tofu_rice_bowl_95": {
+      "name": "Tofu Rice Bowl",
+      "description": "Plant-protein vegan lunch"
+    },
+    "beef_tortilla_bowl_96": {
+      "name": "Beef Tortilla Bowl",
+      "description": "Comforting high-protein dinner"
+    },
+    "yogurt_strawberry_chia_97": {
+      "name": "Yogurt with Strawberries and Chia",
+      "description": "Sweet meal-prep snack"
+    },
+    "chicken_potato_broccoli_98": {
+      "name": "Chicken with Potatoes and Broccoli",
+      "description": "Classic balanced dinner"
+    },
+    "rice_pudding_almond_99": {
+      "name": "Rice Pudding with Almonds",
+      "description": "Sweet comfort snack"
+    },
+    "apple_cinnamon_oat_bars_100": {
+      "name": "Apple Cinnamon Oat Bars",
+      "description": "Fiber-rich meal-prep snack"
+    },
+    "serving": {
+      "breakfast": "1 breakfast serving",
+      "lunch": "1 lunch serving",
+      "dinner": "1 dinner serving",
+      "snack": "1 snack serving"
+    }
+  }
+}

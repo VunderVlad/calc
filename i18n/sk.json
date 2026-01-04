@@ -1,0 +1,707 @@
+{
+  "home": {
+    "title": "Vyber režim kalkulačky",
+    "subtitle": "Vyberte, čo chcete vypočítať.",
+    "user": {
+      "title": "Kalkulačka pre používateľa",
+      "description": "Automatické makrá + týždenný plán + nákupný zoznam."
+    },
+    "trainer": {
+      "title": "Kalkulačka pre trénera",
+      "description": "Ručné makrá + poznámky trénera + týždenný plán."
+    }
+  },
+  "user": {
+    "title": "Kalkulačka pre používateľa",
+    "subtitle": "Zadajte údaje — dostanete makrá, týždenný plán a nákupný zoznam."
+  },
+  "trainer": {
+    "title": "Kalkulačka pre trénera",
+    "subtitle": "Nastavte kalórie/makrá ručne a pridajte poznámky trénera.",
+    "calories": "Kalórie (kcal)",
+    "protein": "Bielkoviny (g)",
+    "carbs": "Sacharidy (g)",
+    "fat": "Tuky (g)",
+    "notes": "Poznámky trénera",
+    "notesPlaceholder": "Špeciálne pokyny, tréningové zameranie, týždenné ciele..."
+  },
+  "form": {
+    "name": "Meno",
+    "email": "Email *",
+    "age": "Vek",
+    "height": "Výška (cm)",
+    "weight": "Váha (kg)",
+    "gender": "Pohlavie",
+    "genderMale": "Muž",
+    "genderFemale": "Žena",
+    "activity": "Aktivita",
+    "goal": "Cieľ",
+    "goalLose": "Schudnúť",
+    "goalMaintain": "Udržať",
+    "goalGain": "Nabrať svaly",
+    "language": "Jazyk",
+    "submit": "Získať plán",
+    "submitting": "Počítam...",
+    "activitySedentary": "Sedavé",
+    "activityLight": "Ľahká",
+    "activityModerate": "Stredná",
+    "activityHigh": "Vysoká",
+    "errorGeneric": "Niečo sa pokazilo. Skúste to znova.",
+    "errorSend": "Plán sa nepodarilo odoslať. Skúste to znova.",
+    "errorNetwork": "Chyba siete. Skúste to znova.",
+    "namePlaceholder": "Vaše meno",
+    "emailPlaceholder": "you@example.com",
+    "emailHelper": "Pošleme váš plán stravovania na tento email",
+    "ageHelper": "Váš vek v rokoch",
+    "heightHelper": "Vaša výška v centimetroch",
+    "weightHelper": "Vaša aktuálna váha v kilogramoch",
+    "genderHelper": "Vyberte vaše pohlavie",
+    "activityHelper": "Ako ste aktívni? Sedavé = málo/žiadne cvičenie, Ľahká = ľahké cvičenie 1-3 dni/týždeň, Stredná = stredné cvičenie 3-5 dní/týždeň, Vysoká = intenzívne cvičenie 6-7 dní/týždeň",
+    "goalHelper": "Aký je váš hlavný cieľ?",
+    "caloriesHelper": "Denný cieľ kalórií v kcal",
+    "proteinHelper": "Denný cieľ bielkovín v gramoch",
+    "carbsHelper": "Denný cieľ sacharidov v gramoch",
+    "fatHelper": "Denný cieľ tukov v gramoch",
+    "coachNotesHelper": "Pridajte akékoľvek špeciálne inštrukcie, zameranie tréningu alebo týždenné ciele pre klienta"
+  },
+  "filters": {
+    "allergensTitle": "Alergény (vyhnúť sa)",
+    "dislikesTitle": "Neobľúbené potraviny (vyhnúť sa)",
+    "tip": "Tip: Ak vyberiete príliš veľa filtrov, nemusí byť dosť jedál na celý týždeň.",
+    "allergens": {
+      "dairy": "Mliečne výrobky",
+      "eggs": "Vajcia",
+      "gluten": "Glutén",
+      "nuts": "Orechy",
+      "peanuts": "Arašidy",
+      "soy": "Sója",
+      "fish": "Ryby",
+      "shellfish": "Morské plody",
+      "sesame": "Sezam",
+      "mustard": "Horčica",
+      "celery": "Zeler",
+      "sulfites": "Siričitany",
+      "lupin": "Vlčí bôb"
+    },
+    "dislikes": {
+      "mushrooms": "Huby",
+      "onions": "Cibuľa",
+      "garlic": "Cesnak",
+      "broccoli": "Brokolica",
+      "cauliflower": "Karfiol",
+      "spinach": "Špenát",
+      "zucchini": "Cuketa",
+      "tomatoes": "Paradajky",
+      "bellPepper": "Paprika",
+      "lentils": "Šošovica",
+      "chickpeas": "Cícer",
+      "beans": "Fazuľa",
+      "tofu": "Tofu",
+      "soy": "Sója",
+      "fish": "Ryby",
+      "shellfish": "Morské plody",
+      "pork": "Bravčové",
+      "beef": "Hovädzie",
+      "chicken": "Kuracie",
+      "eggs": "Vajcia",
+      "milk": "Mlieko",
+      "cheese": "Syr",
+      "yogurt": "Jogurt",
+      "cottageCheese": "Tvaroh",
+      "oats": "Ovsené vločky",
+      "rice": "Ryža",
+      "pasta": "Cestoviny",
+      "nuts": "Orechy",
+      "peanuts": "Arašidy"
+    }
+  },
+  "email": {
+    "userTitle": "Výživový plán DonetsFit{forName}",
+    "trainerTitle": "Trénerov plán DonetsFit{forName}",
+    "userSubject": "Váš stravovací plán DonetsFit",
+    "trainerSubject": "Váš tréningový plán DonetsFit",
+    "thanks": "Ďakujeme, že používate DonetsFit 💚 Nižšie je váš kompletný personalizovaný plán.",
+    "trainerIntro": "Tento plán bol vytvorený v režime trénera 💚 Makrá sú nastavené ručne a jedlá sa generujú automaticky.",
+    "preferencesTitle": "Vaše preferencie",
+    "allergensAvoided": "Alergény",
+    "dislikesAvoided": "Neobľúbené potraviny",
+    "dislikedProducts": "Neobľúbené potraviny",
+    "targetsTitle": "Denné ciele",
+    "weeklyPlanTitle": "Týždenný plán",
+    "shoppingTitle": "Týždenný nákupný zoznam",
+    "ingredients": "Ingrediencie",
+    "howToCook": "Postup",
+    "protein": "bielkoviny",
+    "carbs": "sacharidy",
+    "fat": "tuky",
+    "calories": "Kalórie",
+    "coachNotesTitle": "Poznámky trénera",
+    "tipsTitle": "Tipy",
+    "tip1": "Pite dostatok vody počas dňa",
+    "tip2": "Snažte sa jesť v podobnom čase",
+    "tip3": "Upravte porcie podľa potreby",
+    "tip4": "Dôležitejšia je konzistentnosť než dokonalosť",
+    "bestWishes": "S pozdravom",
+    "bestRegards": "S pozdravom",
+    "team": "DonetsFit tím 💚",
+    "trainerSign": "DonetsFit Trainer 💚",
+    "day": "Deň",
+    "weekTitle": "Týždenný plán",
+    "footer": "S pozdravom, DonetsFit tím 💚",
+    "pdfAttached": "Podrobná PDF verzia vášho plánu stravovania je priložená k tomuto emailu."
+  },
+  "pdf": {
+    "nutritionPlan": "Plán stravovania",
+    "for": "Pre",
+    "language": "Jazyk",
+    "dailyTargets": "Denné ciele",
+    "breakfast": "Raňajky",
+    "lunch": "Obed",
+    "dinner": "Večera",
+    "snack": "Svačina",
+    "weeklyTips": "Týždenné tipy"
+  },
+  "ingredient": {
+    "oats": "Ovsené vločky",
+    "wheyProtein": "Srvátkový proteín",
+    "milk": "Mlieko",
+    "salmon": "Losos",
+    "potatoes": "Zemiaky",
+    "oliveOil": "Olivový olej",
+    "chickenBreast": "Kuracie prsia",
+    "rice": "Ryža",
+    "banana": "Banán",
+    "turkey": "Morka",
+    "tortilla": "Tortilla",
+    "lettuce": "Šalát",
+    "pasta": "Cestoviny",
+    "tomatoes": "Paradajky",
+    "bread": "Chlieb",
+    "peanutButter": "Arašidové maslo",
+    "eggs": "Vajcia",
+    "butter": "Maslo",
+    "greekYogurt": "Grécky jogurt",
+    "berries": "Bobule",
+    "honey": "Med",
+    "tuna": "Tuniak",
+    "mayo": "Majonéza",
+    "cucumber": "Uhorka",
+    "beef": "Hovädzie",
+    "bellPepper": "Paprika",
+    "soySauce": "Sójová omáčka",
+    "cottageCheese": "Tvaroh",
+    "apple": "Jablko",
+    "cinnamon": "Škorica",
+    "walnuts": "Vlašské orechy",
+    "lemon": "Citrón",
+    "riceCakes": "Ryžové koláčiky",
+    "avocado": "Avokádo",
+    "salt": "Soľ",
+    "parmesan": "Parmazán",
+    "garlic": "Cesnak",
+    "carrot": "Mrkva",
+    "onion": "Cibuľa",
+    "spinach": "Špenát",
+    "cheese": "Syr",
+    "broccoli": "Brokolica",
+    "shrimp": "Krevety",
+    "caesarSauce": "Cézarska omáčka",
+    "porkLoin": "Bračová sviečková",
+    "sweetPotato": "Sladký zemiak",
+    "chickpeas": "Cícer",
+    "zucchini": "Cuketa",
+    "groundBeef": "Hovädzí mletý",
+    "chiaSeeds": "Chia semienka",
+    "corn": "Kukurica",
+    "tofu": "Tofu",
+    "carrots": "Mrkva",
+    "lentils": "Šošovica",
+    "beans": "Fazuľa",
+    "granola": "Granola",
+    "yogurt": "Jogurt",
+    "greekYogurt2": "Grécky jogurt 2%",
+    "quinoa": "Quinoa",
+    "bulgur": "Bulgur",
+    "orzo": "Orzo",
+    "noodles": "Rezance",
+    "eggWhites": "Vaječné bielka",
+    "greenBeans": "Zelené fazuľky",
+    "pear": "Hruška",
+    "almonds": "Mandle",
+    "mushrooms": "Húby",
+    "strawberries": "Jahody",
+    "cocoaPowder": "Kakaový prášok"
+  },
+  "step": {
+    "cookOats": "Uvaríme ovsené vločky podľa inštrukcií na obale",
+    "addProtein": "Pridáme proteín a dobre premiešame",
+    "mixAndServe": "Všetko premiešame a podávame",
+    "bakeSalmon": "Pečieme lososa v rúre pri 180°C 15-20 minút",
+    "boilPotatoes": "Varíme zemiaky do mäkka, asi 20 minút",
+    "plateAndServe": "Naložíme na tanier a podávame horúce",
+    "cookChicken": "Opečieme kuracie prsia na panvici do zlatista",
+    "cookRice": "Uvaríme ryžu podľa inštrukcií na obale",
+    "combineAndServe": "Zmiešame všetky ingrediencie a podávame",
+    "boilOats": "Uvaríme ovsené vločky vo vode alebo mlieku do krémovej konzistencie",
+    "sliceBanana": "Nakrájame banán a pridáme do misky",
+    "prepareIngredients": "Pripravíme všetky ingrediencie a odložíme bokom",
+    "wrapAndServe": "Zabalíme ingrediencie do tortilly a podávame",
+    "boilPasta": "Uvaríme cestoviny v osolenej vode do stavu al dente",
+    "prepareSauce": "Pripravíme paradajkovú omáčku s olivovým olejom a koreninami",
+    "toastBread": "Opečieme chlieb do zlatista",
+    "spreadPeanutButter": "Namažeme arašidové maslo na toast",
+    "whiskEggs": "Rozšľaháme vajcia v miske",
+    "cookScramble": "Urobíme míchané vajcia na panvici s maslom",
+    "addYogurtToBowl": "Dáme grécky jogurt do misky",
+    "addBerries": "Pridáme čerstvé bobule navrch",
+    "drizzleHoney": "Polejeme jogurt medom",
+    "mixTunaWithSauce": "Zmiešame tuniaka s majonézou",
+    "assembleSandwich": "Zostavíme sendvič s chlebom, tuniakom a zeleninou",
+    "sliceAndServe": "Nakrájame sendvič a podávame",
+    "stirFryMeat": "Opečieme hovädzie na horúcej panvici",
+    "addVegetablesAndSauce": "Pridáme papriku a sójovú omáčku, varíme do mäkka",
+    "sliceApple": "Nakrájame jablko na tenké plátky",
+    "addCottageCheeseToBowl": "Dáme tvaroh do misky",
+    "topWithAppleAndCinnamon": "Navrch dáme jablko a posypeme škorica",
+    "bakePotatoes": "Pečieme zemiaky v rúre pri 200°C 40-50 minút",
+    "cookSalmon": "Uvaríme lososa na panvici alebo v rúre do rozpadavosti",
+    "finishWithLemon": "Dokončíme šťavou z citróna",
+    "mashAvocado": "Rozmäčkame avokádo vidličkou",
+    "spreadOnRiceCakes": "Namažeme avokádo na ryžové koláčiky",
+    "seasonAndServe": "Ochutíme soľou a podávame",
+    "makeCreamySauce": "Pripravíme krémovú omáčku s gréckym jogurtom a parmazánom",
+    "sauteVegetables": "Opečieme zeleninu na olivovom oleji do mäkka",
+    "addLentilsAndWater": "Pridáme šošovicu a vodu, priviedeme do varu",
+    "simmerUntilSoft": "Dusíme do mäkka šošovice, asi 30 minút",
+    "serveHot": "Podávame horúce",
+    "warmTortilla": "Zohrejeme tortillu na panvici alebo v mikrovlnke",
+    "blendBatter": "Zmiešame všetky ingrediencie na cesto do hladka",
+    "fryPancakes": "Smažíme palacinky na panvici do zlatista z oboch strán",
+    "serveWithToppings": "Podávame s obľúbenými polevami",
+    "cookTurkey": "Uvaríme morku na panvici do úplnej hotovosti",
+    "steamVegetables": "Parníme brokolicu do mäkka",
+    "addPeanutButter": "Pridáme arašidové maslo a dobre premiešame",
+    "sauteGarlic": "Opečieme cesnak na olivovom oleji do vône",
+    "cookShrimp": "Uvaríme krevety do ružovej farby a nepriehľadnosti",
+    "chopLettuce": "Nakrájame šalát na kúsky",
+    "addSauceAndCheese": "Pridáme cézarsku omáčku a parmazán",
+    "tossAndServe": "Premiešame šalát a podávame",
+    "addIngredientsToBlender": "Pridáme všetky ingrediencie do mixéra",
+    "blendUntilSmooth": "Mixujeme do hladkej krémovej konzistencie",
+    "pourAndServe": "Nalejeme do pohára a podávame ihneď",
+    "bakeSweetPotato": "Pečieme sladký zemiak v rúre pri 200°C 45-60 minút",
+    "cookPork": "Uvaríme bračovú sviečkovú na panvici do zlatista",
+    "cookVegetables": "Uvaríme zeleninu na panvici do mäkka",
+    "cookOmelette": "Urobíme omeletu na panvici do stuhnutia",
+    "cookChickpeas": "Uvaríme cícer do mäkka",
+    "roastVegetables": "Pečieme zeleninu v rúre do karamelizácie",
+    "formBurgerPatty": "Vytvoríme placku z hovädzieho mletého",
+    "cookBurger": "Uvaríme placku na panvici do hotovosti",
+    "assembleAndServe": "Zostavíme burger a podávame",
+    "mixIngredients": "Zmiešame všetky ingrediencie spolu",
+    "chillOvernight": "Schladíme v chladničke cez noc",
+    "serveCold": "Podávame studené",
+    "sliceFruit": "Nakrájame ovocie na kúsky",
+    "combineIngredients": "Zmiešame všetky ingrediencie v miske",
+    "serveImmediately": "Podávame ihneď",
+    "prepareWrap": "Pripravíme obal s všetkými ingredienciami",
+    "boilLentils": "Varíme šošovicu do mäkka",
+    "addVegetables": "Pridáme zeleninu a pokračujeme v varení",
+    "simmerAndServe": "Dusíme do hotovosti všetkého a podávame",
+    "mixBatter": "Zmiešame ingrediencie na cesto do hladka",
+    "cookPancakes": "Uvaríme palacinky na panvici",
+    "serveWarm": "Podávame teplé",
+    "drainTuna": "Odlejeme vodu z tuniaka",
+    "stirFryBeef": "Opečieme hovädzie do hneda",
+    "cookEggs": "Uvaríme vajcia podľa vašej preferencie",
+    "cookTofu": "Uvaríme tofu na panvici do zlatista",
+    "stirFryVegetables": "Opečieme zeleninu do mäkka",
+    "cookPasta": "Uvaríme cestoviny do stavu al dente",
+    "sauteShrimp": "Opečieme krevety do hotovosti",
+    "layerIngredients": "Vrstvíme jogurt, granolu a med",
+    "assembleComponents": "Zostavíme všetky komponenty",
+    "placeOnPlate": "Úhľadne naaranžujeme na tanier",
+    "sliceAvocado": "Nakrájame avokádo na kúsky",
+    "topWithNuts": "Posypeme orechmi navrch",
+    "prepareTuna": "Pripravíme tuniaka, scedíme a rozdrobenie",
+    "cookQuinoa": "Uvaríme quinou podľa inštrukcií na obale",
+    "cookBulgur": "Uvaríme bulgur podľa inštrukcií na obale",
+    "formBalls": "Vytvarujeme zmes do guličiek",
+    "chillAndServe": "Ochladíme v chladničke a podávame",
+    "addBeansAndSpices": "Pridáme fazuľu a korenie, varíme do mäkka",
+    "serveWithRice": "Podávame s uvarenou ryžou",
+    "chillBeforeServing": "Ochladíme v chladničke pred podávaním",
+    "cookNoodles": "Uvaríme rezance podľa inštrukcií na obale",
+    "addSpicesAndVegetables": "Pridáme korenie a zeleninu, pokračujeme v varení",
+    "cookLentils": "Uvaríme šošovicu do mäkka",
+    "addMilkAndSimmer": "Pridáme mlieko a dusíme do krémovej konzistencie",
+    "prepareBatter": "Pripravíme cesto zmiešaním všetkých ingrediencií",
+    "bakeUntilSet": "Pečieme do stuhnutia a zlatej farby",
+    "cookEggWhites": "Uvaríme vaječné bielka na panvici do stuhnutia",
+    "cookOrzo": "Uvaríme orzo podľa inštrukcií na obale"
+  },
+  "meal": {
+    "oatmeal_protein_bowl_01": {
+      "name": "Proteínová ovsená kaša",
+      "description": "Vysokobielkovinová raňajka s ovsenými vločkami a srvátkovým proteínom"
+    },
+    "salmon_potato_plate_01": {
+      "name": "Losos so zemiakmi",
+      "description": "Vyvážená večera s lososom bohatým na omega-3"
+    },
+    "chicken_rice_plate_01": {
+      "name": "Kuracie s ryžou",
+      "description": "Klasický vysokobielkovinový obed"
+    },
+    "oatmeal_banana_bowl_05": {
+      "name": "Ovsená kaša s banánom",
+      "description": "Sladká a sýta raňajka"
+    },
+    "chicken_rice_bowl_06": {
+      "name": "Miska s kuracím a ryžou",
+      "description": "Vyvážené bielkoviny a sacharidy"
+    },
+    "turkey_wrap_07": {
+      "name": "Zábal s morkou",
+      "description": "Rýchly a prenosný obed"
+    },
+    "pasta_tomato_sauce_08": {
+      "name": "Cestoviny s paradajkovou omáčkou",
+      "description": "Príjemná vegetariánska večera"
+    },
+    "peanut_butter_toast_09": {
+      "name": "Toast s arašidovým maslom",
+      "description": "Rýchla energetická svačina"
+    },
+    "scrambled_eggs_plate_10": {
+      "name": "Míchané vajcia",
+      "description": "Rýchla vysokobielkovinová raňajka"
+    },
+    "greek_yogurt_berry_cup_11": {
+      "name": "Grécky jogurt s bobuľami",
+      "description": "Vysokobielkovinová svačina s bobuľami"
+    },
+    "tuna_salad_sandwich_12": {
+      "name": "Sendvič s tuniakom",
+      "description": "Rýchly vysokobielkovinový obed"
+    },
+    "beef_stir_fry_rice_13": {
+      "name": "Hovädzie s ryžou",
+      "description": "Vyvážená vysokobielkovinová večera"
+    },
+    "cottage_cheese_apple_bowl_14": {
+      "name": "Tvaroh s jablkom",
+      "description": "Vysokobielkovinová raňajka s ovocím"
+    },
+    "salmon_potato_plate_15": {
+      "name": "Losos so zemiakmi",
+      "description": "Bohatá na omega-3 vyvážená večera"
+    },
+    "rice_cakes_avocado_16": {
+      "name": "Ryžové koláčiky s avokádom",
+      "description": "Rýchla zdravá svačina"
+    },
+    "chicken_pasta_alfredo_light_17": {
+      "name": "Kuracie cestoviny Alfredo (ľahké)",
+      "description": "Krémová vysokobielkovinová večera"
+    },
+    "lentil_soup_bowl_18": {
+      "name": "Šošovicová polievka",
+      "description": "Sýta vegetariánska večera"
+    },
+    "egg_cheese_breakfast_wrap_19": {
+      "name": "Raňajkový zábal s vajcom a syrom",
+      "description": "Vysokobielkovinová prenosná raňajka"
+    },
+    "protein_pancakes_20": {
+      "name": "Proteínové palacinky",
+      "description": "Sladká vysokobielkovinová raňajka"
+    },
+    "turkey_rice_bowl_21": {
+      "name": "Miska s morkou a ryžou",
+      "description": "Vyvážená vysokobielkovinová večera"
+    },
+    "oatmeal_banana_peanut_22": {
+      "name": "Ovsená kaša s banánom a arašidovým maslom",
+      "description": "Energetická raňajka"
+    },
+    "shrimp_pasta_garlic_23": {
+      "name": "Cestoviny s krevety a cesnakom",
+      "description": "Rýchla večera s morskými plodmi"
+    },
+    "chicken_caesar_salad_light_24": {
+      "name": "Cézarsky šalát s kuracím (ľahký)",
+      "description": "Nízko-sacharidový vysokobielkovinový obed"
+    },
+    "protein_berry_smoothie_25": {
+      "name": "Proteínový smoothie s bobuľami",
+      "description": "Vysokobielkovinový nápoj-svačina"
+    },
+    "pork_loin_sweet_potato_26": {
+      "name": "Bračová sviečková so sladkým zemiakom",
+      "description": "Vyvážená večera"
+    },
+    "veggie_omelette_27": {
+      "name": "Zeleninová omeleta",
+      "description": "Rýchla vegetariánska raňajka"
+    },
+    "chickpea_veggie_bowl_28": {
+      "name": "Miska s cícerom a zeleninou",
+      "description": "Bohatá na vlákninu vegánska večera"
+    },
+    "beef_burger_plate_29": {
+      "name": "Hovädzí burger",
+      "description": "Príjemná vysokobielkovinová večera"
+    },
+    "yogurt_chia_pudding_30": {
+      "name": "Jogurtový puding s chia",
+      "description": "Sladká svačina na prípravu vopred"
+    },
+    "salmon_rice_plate_31": {
+      "name": "Losos s ryžou",
+      "description": "Vyvážená večera s omega-3"
+    },
+    "cottage_cheese_fruit_bowl_32": {
+      "name": "Miska s tvarohom a ovocím",
+      "description": "Vysokobielkovinová sladká svačina"
+    },
+    "chicken_wrap_whole_wheat_33": {
+      "name": "Zábal s kuracím (celozrnný)",
+      "description": "Prenosný vyvážený obed"
+    },
+    "lentil_vegetable_soup_34": {
+      "name": "Šošovicová zeleninová polievka",
+      "description": "Bohatá na vlákninu vegánska večera"
+    },
+    "protein_pancakes_35": {
+      "name": "Proteínové palacinky",
+      "description": "Sladká vysokobielkovinová raňajka"
+    },
+    "tuna_corn_salad_36": {
+      "name": "Šalát s tuniakom a kukuricou",
+      "description": "Rýchly vysokobielkovinový obed"
+    },
+    "beef_stir_fry_rice_37": {
+      "name": "Hovädzie s ryžou",
+      "description": "Vysokobielkovinová večera"
+    },
+    "avocado_egg_toast_38": {
+      "name": "Toast s avokádom a vajcom",
+      "description": "Rýchla zdravá raňajka"
+    },
+    "tofu_veggie_stir_fry_39": {
+      "name": "Tofu so zeleninou",
+      "description": "Vegánska večera s rastlinnými bielkovinami"
+    },
+    "banana_yogurt_smoothie_40": {
+      "name": "Smoothie s banánom a jogurtom",
+      "description": "Rýchly nápoj-svačina"
+    },
+    "turkey_rice_bowl_41": {
+      "name": "Miska s morkou a ryžou",
+      "description": "Vyvážená vysokobielkovinová večera"
+    },
+    "oatmeal_apple_cinnamon_42": {
+      "name": "Ovsená kaša s jablkom a škorica",
+      "description": "Bohatá na vlákninu sladká raňajka"
+    },
+    "shrimp_pasta_plate_43": {
+      "name": "Cestoviny s krevety",
+      "description": "Vyvážená večera s morskými plodmi"
+    },
+    "yogurt_granola_cup_44": {
+      "name": "Jogurt s granolou",
+      "description": "Rýchla sladká svačina"
+    },
+    "chicken_potato_plate_45": {
+      "name": "Kuracie so zemiakmi",
+      "description": "Klasická vyvážená večera"
+    },
+    "smoothie_berry_protein_46": {
+      "name": "Proteínový smoothie s bobuľami",
+      "description": "Vysokobielkovinový nápoj-svačina"
+    },
+    "veggie_rice_stir_fry_47": {
+      "name": "Zelenina s ryžou",
+      "description": "Bohatá na vlákninu vegánska večera"
+    },
+    "eggs_spinach_toast_48": {
+      "name": "Vajcia so špenátom na toaste",
+      "description": "Rýchla vysokobielkovinová raňajka"
+    },
+    "beef_bean_chili_49": {
+      "name": "Chili s hovädzím a fazuľou",
+      "description": "Sýta vysokobielkovinová večera"
+    },
+    "apple_peanut_butter_snack_50": {
+      "name": "Jablko s arašidovým maslom",
+      "description": "Rýchla energetická svačina"
+    },
+    "egg_avocado_bowl_51": {
+      "name": "Vajíčka s avokádom",
+      "description": "Rýchle raňajky s zdravými tukmi"
+    },
+    "oatmeal_berry_almond_52": {
+      "name": "Ovsené vločky s bobuľami a mandľami",
+      "description": "Vlákninou bohaté vegetariánske raňajky"
+    },
+    "chicken_quinoa_bowl_53": {
+      "name": "Kuracie prsia s quinoou",
+      "description": "Vyvážený obed s vysokým obsahom bielkovín"
+    },
+    "tuna_rice_bowl_54": {
+      "name": "Tuniak s ryžou",
+      "description": "Rýchly obed s vysokým obsahom bielkovín"
+    },
+    "beef_potato_plate_55": {
+      "name": "Hovädzie so zemiakmi",
+      "description": "Klasická večera s vysokým obsahom bielkovín"
+    },
+    "protein_chia_pudding_56": {
+      "name": "Proteínový puding s chia",
+      "description": "Svačina s vysokým obsahom bielkovín na prípravu vopred"
+    },
+    "turkey_pasta_plate_57": {
+      "name": "Morka s cestovinami",
+      "description": "Večera s vysokým obsahom bielkovín"
+    },
+    "veggie_omelette_plate_58": {
+      "name": "Zeleninová omeleta",
+      "description": "Rýchle vegetariánske raňajky"
+    },
+    "salmon_quinoa_plate_59": {
+      "name": "Losos s quinoou",
+      "description": "Vyvážená večera bohatá na omega-3"
+    },
+    "banana_peanut_smoothie_60": {
+      "name": "Banánový arašidový smoothie",
+      "description": "Energetický nápoj-svačina"
+    },
+    "oatmeal_pear_walnut_61": {
+      "name": "Ovsené vločky s hruškou a vlašskými orechmi",
+      "description": "Vlákninou bohaté vegetariánske raňajky"
+    },
+    "egg_mushroom_scramble_62": {
+      "name": "Vajíčka s hubami",
+      "description": "Rýchle raňajky s vysokým obsahom bielkovín"
+    },
+    "chicken_bulgur_bowl_63": {
+      "name": "Kuracie prsia s bulgurom",
+      "description": "Vyvážený obed s vysokým obsahom bielkovín"
+    },
+    "tuna_pasta_salad_64": {
+      "name": "Šalát s tuniakom a cestovinami",
+      "description": "Rýchly obed s vysokým obsahom bielkovín"
+    },
+    "beef_rice_pepper_65": {
+      "name": "Hovädzie s ryžou a paprikou",
+      "description": "Klasická večera s vysokým obsahom bielkovín"
+    },
+    "yogurt_fruit_nut_cup_66": {
+      "name": "Jogurt s ovocím a orechmi",
+      "description": "Rýchla sladká svačina"
+    },
+    "turkey_potato_plate_67": {
+      "name": "Morka so zemiakmi",
+      "description": "Vyvážená večera"
+    },
+    "protein_oat_balls_68": {
+      "name": "Proteínové ovsené guličky",
+      "description": "Svačina s vysokým obsahom bielkovín na prípravu vopred"
+    },
+    "salmon_veggie_stir_fry_69": {
+      "name": "Losos so zeleninou na wok",
+      "description": "Večera bohatá na omega-3"
+    },
+    "banana_cottage_cheese_70": {
+      "name": "Banán s tvarohom",
+      "description": "Sladká svačina s vysokým obsahom bielkovín"
+    },
+    "oatmeal_pear_walnut_81": {
+      "name": "Ovsené vločky s hruškou a vlašskými orechmi",
+      "description": "Vlákninou bohaté vegetariánske raňajky"
+    },
+    "egg_white_veggie_scramble_82": {
+      "name": "Vaječné bielka so zeleninou",
+      "description": "Raňajky s vysokým obsahom bielkovín a nízkym obsahom tuku"
+    },
+    "chicken_bulgur_bowl_83": {
+      "name": "Kuracie prsia s bulgurom",
+      "description": "Vyvážený obed s vysokým obsahom bielkovín"
+    },
+    "turkey_chili_rice_84": {
+      "name": "Chili z morky s ryžou",
+      "description": "Sýta večera s vysokým obsahom bielkovín"
+    },
+    "protein_pudding_cocoa_85": {
+      "name": "Čokoládový proteínový puding",
+      "description": "Sladká svačina s vysokým obsahom bielkovín"
+    },
+    "beef_noodle_stir_fry_86": {
+      "name": "Hovädzie s rezancami na wok",
+      "description": "Sýta večera s vysokým obsahom bielkovín"
+    },
+    "cottage_cheese_honey_nuts_87": {
+      "name": "Tvaroh s medom a orechmi",
+      "description": "Sladká svačina s vysokým obsahom bielkovín"
+    },
+    "salmon_orzo_plate_88": {
+      "name": "Losos s orzo",
+      "description": "Vyvážená večera bohatá na omega-3"
+    },
+    "apple_yogurt_cinnamon_89": {
+      "name": "Jablko s jogurtom a škorica",
+      "description": "Rýchla ľahká svačina"
+    },
+    "veggie_lentil_curry_90": {
+      "name": "Zeleninové karí so šošovicou",
+      "description": "Vlákninou bohatá vegánska večera"
+    },
+    "oatmeal_chocolate_peanut_91": {
+      "name": "Čokoládová arašidová ovsená kaša",
+      "description": "Sladké energetické raňajky"
+    },
+    "chicken_wrap_avocado_92": {
+      "name": "Kuracia tortilla s avokádom",
+      "description": "Vyvážený prenosný obed"
+    },
+    "shrimp_rice_bowl_93": {
+      "name": "Krevety s ryžou",
+      "description": "Vyvážená večera s morskými plodmi"
+    },
+    "protein_banana_pancakes_94": {
+      "name": "Proteínové banánové palacinky",
+      "description": "Sladké raňajky s vysokým obsahom bielkovín"
+    },
+    "tofu_rice_bowl_95": {
+      "name": "Tofu s ryžou",
+      "description": "Vegánsky obed s rastlinnými bielkovinami"
+    },
+    "beef_tortilla_bowl_96": {
+      "name": "Hovädzie v tortille",
+      "description": "Sýta večera s vysokým obsahom bielkovín"
+    },
+    "yogurt_strawberry_chia_97": {
+      "name": "Jogurt s jahodami a chia",
+      "description": "Sladká svačina na prípravu vopred"
+    },
+    "chicken_potato_broccoli_98": {
+      "name": "Kuracie prsia so zemiakmi a brokolicou",
+      "description": "Klasická vyvážená večera"
+    },
+    "rice_pudding_almond_99": {
+      "name": "Ryžový puding s mandľami",
+      "description": "Sladká útulná svačina"
+    },
+    "apple_cinnamon_oat_bars_100": {
+      "name": "Ovsené tyčinky s jablkom a škorica",
+      "description": "Vlákninou bohatá svačina na prípravu vopred"
+    },
+    "serving": {
+      "breakfast": "1 porcia raňajok",
+      "lunch": "1 porcia obeda",
+      "dinner": "1 porcia večere",
+      "snack": "1 snack"
+    }
+  }
+}

@@ -2,133 +2,36 @@
 "use client";
 
 import Link from "next/link";
-import { useI18n } from "@/lib/i18n";
+import { t } from "@/lib/i18n/i18n";
+import { useLanguage } from "@/components/i18n/LanguageProvider";
 
-export default function Home() {
-  const { t, lang } = useI18n(); // <-- translation hook
-
-  const reset = `
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; }
-  `;
-
-  const red = "#ff4d4d";
-
-  const page: React.CSSProperties = {
-    position: "fixed",
-    inset: 0,
-    backgroundColor: "#1a1a1a",
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "48px 20px",
-    fontFamily:
-      "'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-    textRendering: "optimizeLegibility",
-  };
-
-  const content: React.CSSProperties = {
-    maxWidth: 760,
-    textAlign: "center",
-  };
-
-  const brand: React.CSSProperties = {
-    fontSize: 36,
-    fontWeight: 800,
-    letterSpacing: "0.3px",
-  };
-
-  const redSpan: React.CSSProperties = { color: red };
-
-  const sub: React.CSSProperties = {
-    margin: "16px auto 28px",
-    color: "#cfcfcf",
-    lineHeight: 1.65,
-    fontSize: 16,
-    maxWidth: 640,
-  };
-
-  const bar: React.CSSProperties = {
-    width: 72,
-    height: 4,
-    backgroundColor: red,
-    borderRadius: 2,
-    margin: "16px auto 24px",
-  };
-
-  const links: React.CSSProperties = {
-    display: "flex",
-    gap: 12,
-    flexWrap: "wrap",
-    justifyContent: "center",
-  };
-
-  const btnBase: React.CSSProperties = {
-    display: "inline-block",
-    padding: "12px 18px",
-    borderRadius: 10,
-    textDecoration: "none",
-    fontWeight: 800,
-  };
-
-  const btnPrimary: React.CSSProperties = {
-    ...btnBase,
-    background:
-      "linear-gradient(180deg, rgba(255,77,77,1) 0%, rgba(255,120,120,1) 100%)",
-    color: "#0b0b0b",
-  };
-
-  const btnGhost: React.CSSProperties = {
-    ...btnBase,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    color: "#fff",
-  };
+export default function HomePage() {
+  const { language } = useLanguage();
 
   return (
-    <>
-      <style
-        dangerouslySetInnerHTML={{ __html: reset }}
-        suppressHydrationWarning
-      />
+    <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-16">
+      <div className="text-center mb-10 md:mb-12">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white mb-3">{t(language, "home.title", "Choose Calculator Mode")}</h2>
+        <p className="text-[#EEEEEE] mt-2 text-sm md:text-base">{t(language, "home.subtitle", "Select what you want to calculate.")}</p>
+      </div>
 
-      <main key={lang} style={page}>
-        <div style={content}>
-          <h1 style={brand}>
-            Donets<span style={redSpan}>Fit</span>
-          </h1>
+      <div className="grid gap-4 md:gap-5">
+        <Link
+          href="/user"
+          className="border border-white/20 rounded-[5px] p-6 md:p-8 hover:border-[#EF4444] hover:bg-white/5 transition-all duration-200"
+        >
+          <div className="text-lg md:text-xl font-semibold text-white">{t(language, "home.user.title", "User calculator")}</div>
+          <div className="text-[#EEEEEE] mt-2 text-sm md:text-base">{t(language, "home.user.description", "Automatic macro calculation + weekly meal plan.")}</div>
+        </Link>
 
-          <div style={bar} />
-
-          <p style={sub}>
-            {t.home.intro.replace("DonetsFit", "DonetsFit")} 
-          </p>
-
-          <div style={links}>
-            <a
-              href="https://donetsfit.com/"
-              style={btnGhost}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t.home.back}
-            </a>
-
-            <a
-              href="https://instagram.com/donets.vlad/"
-              style={btnGhost}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t.home.instagram}
-            </a>
-
-            <Link href="/calculator" style={btnPrimary}>
-              {t.home.goCalc}
-            </Link>
-          </div>
-        </div>
-      </main>
-    </>
+        <Link
+          href="/trainer"
+          className="border border-white/20 rounded-[5px] p-6 md:p-8 hover:border-[#EF4444] hover:bg-white/5 transition-all duration-200"
+        >
+          <div className="text-lg md:text-xl font-semibold text-white">{t(language, "home.trainer.title", "Trainer calculator")}</div>
+          <div className="text-[#EEEEEE] mt-2 text-sm md:text-base">{t(language, "home.trainer.description", "Manual macros + coach notes + weekly plan.")}</div>
+        </Link>
+      </div>
+    </div>
   );
 }
