@@ -35,3 +35,14 @@ body {
     border-radius: 5px;
   }
 }
+
+/* Ensure select and option elements have proper styling */
+select {
+  color: #FFFFFF;
+  background-color: #1A1A1A;
+}
+
+select option {
+  color: #FFFFFF;
+  background-color: #1A1A1A;
+}
