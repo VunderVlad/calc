@@ -6,7 +6,11 @@ import type { Language } from "@/lib/i18n/i18n";
 import { t } from "@/lib/i18n/i18n";
 import type { WeekPlan } from "@/lib/meals/generateWeekPlan";
 import type { Meal } from "@/lib/meals/mealTypes";
-import type { AutoMacroResult, TrainerMacroResult } from "@/lib/calc/calcMacros";
+import type { AutoMacroResult } 
+from "@/lib/calc/calcMacros";
+
+import type { TrainerMacroResult } 
+from "@/lib/calc/calcTrainerMacros";
 import { generateGroceryList } from "@/lib/meals/groceryList";
 
 type MacroResult = AutoMacroResult | TrainerMacroResult;
