@@ -2,7 +2,7 @@
 import "./globals.css";
 import type { ReactNode } from "react";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
-import { LanguageSelect } from "@/components/i18n/LanguageSelect";
+import { Navigation } from "@/components/navigation/Navigation";
 import Link from "next/link";
 
 export const metadata = {
@@ -25,29 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   </h1>
                 </Link>
                 
-                <nav className="flex items-center gap-4 md:gap-6 flex-wrap justify-center">
-                  <Link 
-                    href="/user" 
-                    className="text-secondary hover:text-white transition-colors text-sm md:text-base"
-                  >
-                    User Calculator
-                  </Link>
-                  <Link 
-                    href="/trainer" 
-                    className="text-secondary hover:text-white transition-colors text-sm md:text-base"
-                  >
-                    Trainer Calculator
-                  </Link>
-                  <Link 
-                    href="https://donetsfit.com" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-secondary hover:text-white transition-colors text-sm md:text-base"
-                  >
-                    DonetsFit.com
-                  </Link>
-              <LanguageSelect />
-                </nav>
+                <Navigation />
               </div>
             </header>
 

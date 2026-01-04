@@ -6,11 +6,8 @@ import type { Language } from "@/lib/i18n/i18n";
 import { t } from "@/lib/i18n/i18n";
 import type { WeekPlan } from "@/lib/meals/generateWeekPlan";
 import type { Meal } from "@/lib/meals/mealTypes";
-import type { AutoMacroResult } 
-from "@/lib/calc/calcMacros";
-
-import type { TrainerMacroResult } 
-from "@/lib/calc/calcTrainerMacros";
+import type { AutoMacroResult } from "@/lib/calc/calcMacros";
+import type { TrainerMacroResult } from "@/lib/calc/calcTrainerMacros";
 import { generateGroceryList } from "@/lib/meals/groceryList";
 
 type MacroResult = AutoMacroResult | TrainerMacroResult;
@@ -27,10 +24,12 @@ type NutritionPlan = {
 
 // Brand colors
 const BRAND_RED = rgb(0.937, 0.267, 0.267); // #EF4444
-const TEXT_DARK = rgb(0.1, 0.1, 0.1);
+const TEXT_DARK = rgb(0.15, 0.15, 0.15); // Dark gray, not pure black
 const TEXT_MEDIUM = rgb(0.45, 0.45, 0.45);
 const TEXT_LIGHT = rgb(0.65, 0.65, 0.65);
 const BORDER_LIGHT = rgb(0.85, 0.85, 0.85);
+const BG_LIGHT = rgb(0.98, 0.97, 0.97); // Very light warm gray background
+const BG_COVER = rgb(0.99, 0.98, 0.98); // Slightly different for cover page
 
 /**
  * Embeds a Unicode-supporting font for Cyrillic characters
@@ -195,7 +194,20 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
   const footerHeight = 50; // Reserved space for footer
   const contentBottom = marginPoints + footerHeight;
   
+  // Helper: Draw page background
+  const drawPageBackground = (page: any, isCover: boolean = false) => {
+    const bgColor = isCover ? BG_COVER : BG_LIGHT;
+    page.drawRectangle({
+      x: 0,
+      y: 0,
+      width: pageWidth,
+      height: pageHeight,
+      color: bgColor,
+    });
+  };
+
   let currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  drawPageBackground(currentPage, true); // Cover page
   let currentY = contentTop;
   let pageNumber = 1;
 
@@ -292,7 +304,7 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
     x: number,
     y: number,
     maxWidth: number,
-    color: [number, number, number] = TEXT_DARK
+    color: ReturnType<typeof rgb> = TEXT_DARK
   ): number => {
     if (!text) return 0;
     const words = text.split(" ");
@@ -426,14 +438,15 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
   rightY -= 22;
 
   const macroFields = [
-    { label: safeTranslate("email.calories", "Calories"), value: `${macros.calories} kcal` },
-    { label: safeTranslate("email.carbs", "Carbs"), value: `${macros.carbs} g` },
-    { label: safeTranslate("email.protein", "Protein"), value: `${macros.protein} g` },
-    { label: safeTranslate("email.fat", "Fats"), value: `${macros.fat} g` },
+    { icon: "🔥", label: safeTranslate("email.calories", "Calories"), value: `${macros.calories} kcal` },
+    { icon: "🌾", label: safeTranslate("email.carbs", "Carbs"), value: `${macros.carbs} g` },
+    { icon: "💪", label: safeTranslate("email.protein", "Protein"), value: `${macros.protein} g` },
+    { icon: "🥑", label: safeTranslate("email.fat", "Fats"), value: `${macros.fat} g` },
   ];
 
   macroFields.forEach((field) => {
-    currentPage.drawText(field.label, {
+    const labelText = `${field.icon} ${field.label}`;
+    currentPage.drawText(labelText, {
       x: rightColumnX,
       y: rightY,
       size: 9,
@@ -491,10 +504,12 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
     // Always create new page for each day
     if (dayIndex === 0) {
       currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+      drawPageBackground(currentPage, false);
       currentY = contentTop;
       pageNumber = 2;
     } else {
       currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+      drawPageBackground(currentPage, false);
       currentY = contentTop;
       pageNumber = dayIndex + 2;
     }
@@ -663,8 +678,17 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
       
       let cardY = cardStartY - cardPadding;
       
-      // Meal type (red)
-      currentPage.drawText(mealType, {
+      // Meal type with emoji (red)
+      const mealEmojis: Record<string, string> = {
+        [safeTranslate("pdf.breakfast", "Breakfast")]: "🍳",
+        [safeTranslate("pdf.lunch", "Lunch")]: "🍽",
+        [safeTranslate("pdf.dinner", "Dinner")]: "🍲",
+        [safeTranslate("pdf.snack", "Snack")]: "🍎",
+      };
+      const mealEmoji = mealEmojis[mealType] || "";
+      const mealTypeText = mealEmoji ? `${mealEmoji} ${mealType}` : mealType;
+      
+      currentPage.drawText(mealTypeText, {
         x: marginPoints + cardPadding,
         y: cardY,
         size: isSnack ? 9 : (useCompactMode ? 9 : 10),
@@ -683,12 +707,12 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
         cardY -= actualDescHeight + spacingBetween;
       }
 
-      // Nutrition line
+      // Nutrition line with emojis
       const kcal = meal.baseCalories > 0
         ? meal.baseCalories
         : meal.protein * 4 + meal.carbs * 4 + meal.fat * 9;
       
-      const nutritionText = `${kcal} kcal ${meal.protein} protein ${meal.carbs} carbs ${meal.fat} fat`;
+      const nutritionText = `🔥 ${kcal} kcal  💪 ${meal.protein} protein  🌾 ${meal.carbs} carbs  🥑 ${meal.fat} fat`;
       currentPage.drawText(nutritionText, {
         x: marginPoints + cardPadding,
         y: cardY,
@@ -706,9 +730,9 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
       const leftX = marginPoints + cardPadding;
       const rightX = marginPoints + cardPadding + columnWidth + (isSnack ? 8 : 12);
 
-      // Left: Ingredients
+      // Left: Ingredients with emoji
       let leftY = cardY;
-      currentPage.drawText(safeTranslate("email.ingredients", "Ingredients"), {
+      currentPage.drawText(`🧺 ${safeTranslate("email.ingredients", "Ingredients")}`, {
         x: leftX,
         y: leftY,
         size: headerFontSize,
@@ -759,6 +783,7 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
 
   // ========== SHOPPING LIST PAGE (9) - TABLE FORMAT ==========
   currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+  drawPageBackground(currentPage, false);
   currentY = contentTop;
   pageNumber = 9;
 
@@ -796,6 +821,7 @@ export async function generateNutritionPlanPdf(plan: NutritionPlan): Promise<Buf
 
     if (currentY - 25 - items.length * 16 < contentBottom) {
       currentPage = pdfDoc.addPage([pageWidth, pageHeight]);
+      drawPageBackground(currentPage, false);
       currentY = contentTop;
       pageNumber++;
     }

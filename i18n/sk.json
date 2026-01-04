@@ -1,4 +1,8 @@
 {
+  "nav": {
+    "userCalculator": "Kalkulačka pre používateľa",
+    "trainerCalculator": "Kalkulačka pre trénera"
+  },
   "home": {
     "title": "Vyber režim kalkulačky",
     "subtitle": "Vyberte, čo chcete vypočítať.",
@@ -148,7 +152,8 @@
     "day": "Deň",
     "weekTitle": "Týždenný plán",
     "footer": "S pozdravom, DonetsFit tím 💚",
-    "pdfAttached": "Podrobná PDF verzia vášho plánu stravovania je priložená k tomuto emailu."
+    "pdfAttached": "Podrobná PDF verzia vášho plánu stravovania je priložená k tomuto emailu.",
+    "planInPdf": "Váš kompletný 7-dňový plán stravovania s raňajkami, obedom, večerou a svačinami na každý deň je zahrnutý v priloženom PDF. PDF tiež obsahuje podrobné recepty, inštrukcie na varenie a kompletný nákupný zoznam na týždeň."
   },
   "pdf": {
     "nutritionPlan": "Plán stravovania",

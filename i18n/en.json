@@ -1,4 +1,8 @@
 {
+  "nav": {
+    "userCalculator": "User Calculator",
+    "trainerCalculator": "Trainer Calculator"
+  },
   "home": {
     "title": "Choose Calculator Mode",
     "subtitle": "Select what you want to calculate.",
@@ -148,7 +152,8 @@
     "day": "Day",
     "weekTitle": "Weekly Meal Plan",
     "footer": "Best wishes, DonetsFit Team 💚",
-    "pdfAttached": "A detailed PDF version of your nutrition plan is attached to this email."
+    "pdfAttached": "A detailed PDF version of your nutrition plan is attached to this email.",
+    "planInPdf": "Your complete 7-day meal plan with breakfast, lunch, dinner, and snacks for each day is included in the attached PDF. The PDF also contains detailed recipes, cooking instructions, and a complete grocery list for the week."
   },
   "pdf": {
     "nutritionPlan": "Nutrition Plan",
